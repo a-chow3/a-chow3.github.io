@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UVA Baseball Performance Dashboard · Adam Chow</title>
+<meta name="description" content="Interactive case study: a UVA Baseball R Shiny dashboard for hitting, pitching, and catching. Live demo with fabricated dummy data." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  .field-svg{background:#2d6a4f;border-radius:12px;display:block;margin:0 auto;}
+  .zonebox{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;}
+  .loc-multi{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+  .checkrow{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 12px;}
+  .checkrow label{font-size:.82rem;display:inline-flex;align-items:center;gap:5px;font-weight:600;cursor:pointer;}
+  .swatch{width:11px;height:11px;border-radius:3px;display:inline-block;}
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="container">
+  <a class="brand" href="index.html" style="text-decoration:none">Adam<span>Chow</span></a>
+  <button class="burger" id="burger" aria-label="Menu">☰</button>
+  <div class="links" id="navlinks">
+    <a href="index.html#projects">Projects</a>
+    <a href="dashboard.html">Basketball Dashboard</a>
+    <a href="index.html" class="btn-nav">← Home</a>
+  </div>
+</div></nav>
+
+<header class="cs-hero"><div class="container">
+  <a href="index.html#projects" class="back">← Back to projects</a>
+  <span class="eyebrow">Baseball · Featured project</span>
+  <h1>UVA Baseball Performance Dashboard</h1>
+  <p class="sub">The one stop shop that UVA Baseball uses to study hitting, pitching, and catching. Players and coaches
+    move through matchups, zones, pitch arsenals, tendencies, locations, trends, and catcher framing, all in one
+    interactive place.</p>
+  <div class="cs-meta">
+    <div class="box"><div class="l">Role</div><div class="v">Student Director of Analytics, lead developer</div></div>
+    <div class="box"><div class="l">Stack</div><div class="v">R Shiny · TrackMan · ggplot2 · plotly</div></div>
+    <div class="box"><div class="l">Audience</div><div class="v">Players, pitching staff, coaches</div></div>
+    <div class="box"><div class="l">Status</div><div class="v">In production · Aug 2024 to present</div></div>
+  </div>
+</div></header>
+
+<section class="section"><div class="container prose">
+  <div class="demo-banner"><b>Interactive demo below.</b> The live dashboard runs on UVA's proprietary
+    <code>Master_CSV.csv</code> tracking data. Everything on this page uses <b>fabricated dummy players and numbers</b>.
+    The layout, the metrics, and every visual mirror the real tool, but no confidential data is present.</div>
+
+  <h2>Purpose</h2>
+  <p>UVA charts thousands of pitches and swings a season. On its own that data sits in a spreadsheet nobody opens. I
+    built this dashboard so a hitter can walk in, pick their name, and immediately see how they do against lefties,
+    where they punish the ball in the zone, and where they get beat. Pitchers get the same clarity on their arsenal,
+    their tendencies by count, their command, and how their stuff is trending. It replaced long film and number
+    sessions with a tool anyone on the team can read in a minute.</p>
+
+  <h2>Target audience</h2>
+  <p>Players first, coaches second. That shaped every design choice. The language is plain, the visuals are big, and
+    the most useful view is always the default. A player should never need me in the room to understand their own page.</p>
+
+  <h2>Methods</h2>
+  <p>Daily TrackMan exports land in a cleaned master table. From there I compute the standard slash line and the modern
+    batted ball and plate discipline metrics, split everything by handedness and by zone, profile each pitch by
+    velocity, spin, movement, usage, command, and whiff, and score catcher framing as stolen and lost strikes
+    translated into wOBA. The production tool also carries Umpire and Biomechanics modules, and the three shown here,
+    Hitting, Pitching, and Catching, are the interactive core.</p>
+
+  <h2>Results</h2>
+  <p>The dashboard cut our analysis meeting time by more than half and gave the team a shared language for performance.
+    During my time with the group the pitching staff climbed from seventh in the conference in ERA to second.</p>
+
+  <h2>Skills demonstrated</h2>
+  <div class="chips">
+    <span class="chip">R Shiny</span><span class="chip">ggplot2</span><span class="chip">plotly</span><span class="chip">Reactive UI</span>
+    <span class="chip">TrackMan data</span><span class="chip">Batted ball metrics</span><span class="chip">Pitch profiling</span>
+    <span class="chip">Run value modeling</span><span class="chip">Data visualization</span>
+  </div>
+</div></section>
+
+<section class="section alt"><div class="container">
+  <span class="eyebrow">Live demo · <span class="pill dummy">dummy data</span></span>
+  <h2 style="margin-bottom:6px;">Explore the dashboard</h2>
+  <p style="color:var(--muted);max-width:700px;margin-bottom:20px;">Pick a module, then a player. Every table and chart
+    recomputes for your selection, exactly like the production app.</p>
+
+  <div class="panel" style="padding:20px 22px;">
+    <div class="tabs2" id="mainTabs">
+      <button class="tab2 active" data-pane="paneHit">Hitting</button>
+      <button class="tab2" data-pane="panePit">Pitching</button>
+      <button class="tab2" data-pane="paneCat">Catching</button>
+    </div>
+
+    <!-- ============ HITTING ============ -->
+    <div id="paneHit" class="pane2 active">
+      <div class="subtabs" data-group="hit">
+        <button class="subtab active" data-sub="hitTables">Data Tables</button>
+        <button class="subtab" data-sub="hitMatchup">Matchup Analysis</button>
+        <button class="subtab" data-sub="hitZone">Zone Analysis</button>
+      </div>
+
+      <div id="hitTables" class="subpane active">
+        <div class="select-row">
+          <div><label>vs Pitcher Hand</label><select id="htHand"><option>All</option><option>Left</option><option>Right</option></select></div>
+          <div><label>Minimum PA</label><select id="htMinPa"><option>1</option><option selected>10</option><option>20</option><option>40</option></select></div>
+        </div>
+        <div style="overflow-x:auto;"><table class="dtable-lite" id="hitTable"></table></div>
+        <div class="how-to"><b>How to read it:</b> the full hitting board, sortable by any column. wOBA rolls all offensive
+          value into one number where about .320 is average and .400 is elite. In Zone Swing, Chase, Whiff, and Pull Air
+          describe swing decisions and contact quality that a slash line hides.</div>
+      </div>
+
+      <div id="hitMatchup" class="subpane">
+        <div class="select-row">
+          <div><label>Hitter</label><select id="mHitter"></select></div>
+          <div><label>Pitcher Throws</label><select id="mThrows"><option>All</option><option>Left</option><option>Right</option></select></div>
+          <div><label>Hits shown</label><select id="mHitType"><option>Include Outs</option><option>Only Hits</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1.1fr .9fr;gap:20px;" class="mm-grid">
+          <div><h4 style="margin:0 0 8px;">Batted Ball Spray Chart</h4><svg id="spraySvg" class="field-svg" viewBox="0 0 380 360" width="100%"></svg>
+            <div id="sprayLegend" class="checkrow" style="justify-content:center;"></div></div>
+          <div><h4 style="margin:0 0 8px;">Contact Map by Pitch Type</h4><div class="zonebox"><svg id="contactSvg" viewBox="0 0 300 320" width="100%"></svg></div>
+            <div id="contactLegend" class="checkrow" style="justify-content:center;"></div></div>
+        </div>
+        <h4 style="margin:18px 0 8px;">Individual Play Dataset</h4>
+        <div style="overflow-x:auto;max-height:320px;overflow-y:auto;"><table class="dtable-lite" id="playTable"></table></div>
+        <div class="how-to"><b>How to read it:</b> the spray chart plots every batted ball by where it landed, colored by
+          result, so pull and oppo tendencies jump out. The contact map shows those same balls back in the strike zone,
+          colored by the pitch type that produced them, which is where you learn what a hitter can and cannot square up.</div>
+      </div>
+
+      <div id="hitZone" class="subpane">
+        <div class="select-row">
+          <div><label>Hitter</label><select id="zHitter"></select></div>
+          <div><label>Pitcher Throws</label><select id="zThrows"><option>All</option><option>Left</option><option>Right</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;" class="mm-grid">
+          <div>
+            <div class="select-row" style="margin-bottom:8px;"><div><label>Metric</label><select id="czMetric"><option>Swing</option><option>Contact</option><option>Whiff</option></select></div></div>
+            <div class="zonebox"><svg id="czSvg" viewBox="0 0 260 300" width="100%"></svg></div>
+            <div style="text-align:center;font-size:.78rem;color:var(--muted);margin-top:6px;">Swing decision rate by zone · catcher's view</div>
+          </div>
+          <div>
+            <div class="select-row" style="margin-bottom:8px;"><div><label>Metric</label><select id="cvMetric"><option>Exit Velo</option><option>Hard Hit %</option><option>Sweet Spot %</option></select></div></div>
+            <div class="zonebox"><svg id="cvSvg" viewBox="0 0 260 300" width="100%"></svg></div>
+            <div style="text-align:center;font-size:.78rem;color:var(--muted);margin-top:6px;">Contact quality by zone · catcher's view</div>
+          </div>
+        </div>
+        <div class="how-to"><b>How to read it:</b> both maps use the blue to red scale, where red is hotter for the hitter.
+          The left map is swing, contact, or whiff rate by zone, the right map is exit velocity or quality of contact.
+          Together they show what a hitter chases, what they punish, and where a pitcher should live.</div>
+      </div>
+    </div>
+
+    <!-- ============ PITCHING ============ -->
+    <div id="panePit" class="pane2">
+      <div class="subtabs" data-group="pit">
+        <button class="subtab active" data-sub="pitTables">Data Tables</button>
+        <button class="subtab" data-sub="pitArsenal">Pitch Arsenal</button>
+        <button class="subtab" data-sub="pitSitu">Situational Analysis</button>
+        <button class="subtab" data-sub="pitLoc">Pitch Locations</button>
+        <button class="subtab" data-sub="pitTrends">Performance Trends</button>
+      </div>
+
+      <div id="pitTables" class="subpane active">
+        <div class="select-row">
+          <div><label>vs Batter Hand</label><select id="ptHand"><option>All</option><option>Left</option><option>Right</option></select></div>
+          <div><label>Count Situation</label><select id="ptCount"><option>All Counts</option><option>Ahead</option><option>Behind</option><option>Even</option></select></div>
+          <div><label>Minimum Pitches</label><select id="ptMin"><option>10</option><option selected>50</option><option>100</option></select></div>
+        </div>
+        <div style="overflow-x:auto;"><table class="dtable-lite" id="pitTable"></table></div>
+        <div class="how-to"><b>How to read it:</b> BF is batters faced. CSW is called strikes plus whiffs over pitches, a
+          single stickiness number for a pitch mix. FPS is first pitch strike rate. Sort to find who misses bats, who
+          fills the zone, and who does both.</div>
+      </div>
+
+      <div id="pitArsenal" class="subpane">
+        <div class="select-row"><div><label>Pitcher</label><select id="aPitcher"></select></div></div>
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;" class="mm-grid">
+          <div><h4 style="margin:0 0 8px;">Pitch Movement Profile</h4><div class="chart-wrap"><canvas id="movementChart"></canvas></div></div>
+          <div><h4 style="margin:0 0 8px;">Pitch Usage vs LHH and RHH</h4><div class="chart-wrap"><canvas id="usageChart"></canvas></div></div>
+        </div>
+        <div class="how-to"><b>How to read it:</b> the movement plot shows how each pitch breaks relative to a spinless ball
+          from the pitcher's view, with a dashed cloud for its spread. Pitches far apart give hitters different looks.
+          The usage bars split how often each pitch is thrown to lefties versus righties.</div>
+      </div>
+
+      <div id="pitSitu" class="subpane">
+        <div class="select-row"><div><label>Pitcher</label><select id="sPitcher"></select></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="mm-grid">
+          <div><h4 style="margin:0 0 8px;">Count State Transition Matrix</h4><div class="zonebox"><svg id="transSvg" viewBox="0 0 300 300" width="100%"></svg></div></div>
+          <div><h4 style="margin:0 0 8px;">Net Run Value by Count</h4><div class="zonebox" style="background:#0e1f17;"><svg id="countSvg" viewBox="0 0 320 320" width="100%"></svg></div></div>
+        </div>
+        <div class="how-to"><b>How to read it:</b> the transition matrix shows the probability of the next pitch type given
+          the last one, so predictable sequencing shows up as a hot cell. The count map lays every count in a diamond,
+          sized and colored by the net run value the pitcher earns there, positive meaning runs saved.</div>
+      </div>
+
+      <div id="pitLoc" class="subpane">
+        <div class="select-row"><div><label>Pitcher</label><select id="lPitcher"></select></div></div>
+        <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:20px;" class="mm-grid">
+          <div><h4 style="margin:0 0 8px;">Location Heat Maps by Pitch Type</h4><div class="loc-multi" id="locMulti"></div></div>
+          <div><h4 style="margin:0 0 8px;">Zone Distribution and Net Runs</h4><div class="zonebox"><svg id="zoneDistSvg" viewBox="0 0 300 320" width="100%"></svg></div>
+            <div id="zoneDistLegend" class="checkrow" style="justify-content:center;"></div></div>
+        </div>
+        <div class="how-to"><b>How to read it:</b> each small map is one pitch, shaded by where it lands most, with the strike
+          zone outlined. The zone distribution buckets every pitch into Heart, Shadow, Chase, or Waste and shows the net
+          runs earned in each, which is how you judge command and intent, not just raw location.</div>
+      </div>
+
+      <div id="pitTrends" class="subpane">
+        <div class="select-row">
+          <div><label>Pitcher</label><select id="tPitcher"></select></div>
+          <div><label>Metric</label><select id="tMetric"><option value="velo">Release Velocity</option><option value="spin">Spin Rate</option><option value="hb">Horizontal Break</option><option value="ivb">Induced Vertical Break</option></select></div>
+        </div>
+        <h4 style="margin:0 0 8px;">Pitch Performance Over Season</h4>
+        <div class="chart-wrap"><canvas id="seasonChart"></canvas></div>
+        <div class="select-row" style="margin-top:18px;">
+          <div><label>Game Date</label><select id="gDate"></select></div>
+          <div><label>Pitch Type</label><select id="gPitch"></select></div>
+          <div><label>Metric</label><select id="gMetric"><option value="velo">Release Velocity</option><option value="spin">Spin Rate</option><option value="hb">Horizontal Break</option><option value="ivb">Induced Vertical Break</option></select></div>
+        </div>
+        <h4 style="margin:0 0 8px;">Single Game Decay</h4>
+        <div class="chart-wrap short"><canvas id="decayChart"></canvas></div>
+        <div class="how-to"><b>How to read it:</b> the season view tracks a metric outing by outing for every pitch, with the
+          bold markers as game averages. The decay view zooms into one start and one pitch, with a trend line, to catch
+          the late game velocity dip that can flag fatigue before it becomes an injury.</div>
+      </div>
+    </div>
+
+    <!-- ============ CATCHING ============ -->
+    <div id="paneCat" class="pane2">
+      <div class="subtabs" data-group="cat"><button class="subtab active" data-sub="catFraming">Framing</button></div>
+      <div id="catFraming" class="subpane active">
+        <div class="select-row">
+          <div><label>Catcher</label><select id="fCatcher"></select></div>
+          <div><label>Pitcher Hand</label><select id="fPHand"><option>All</option><option>Left</option><option>Right</option></select></div>
+          <div><label>Batter Hand</label><select id="fBHand"><option>All</option><option>Left</option><option>Right</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:20px;" class="mm-grid">
+          <div><div class="zonebox"><svg id="frameSvg" viewBox="0 0 300 340" width="100%"></svg></div>
+            <div id="frameLegend" class="checkrow" style="justify-content:center;"></div></div>
+          <div id="frameMetrics"></div>
+        </div>
+        <div class="how-to"><b>How to read it:</b> green stars are stolen strikes, borderline pitches the catcher framed into
+          called strikes. Red crosses are strikes he lost. The panel converts those into wOBA saved, because a stolen
+          strike changes the count and the count changes run expectancy. Net frames plus a positive wOBA per pitch is a
+          catcher earning his spot on defense alone.</div>
+      </div>
+    </div>
+
+  </div>
+</div></section>
+
+<footer class="footer"><div class="container">
+  <h2>More in the portfolio</h2>
+  <div class="social">
+    <a href="index.html">← Back to portfolio</a>
+    <a href="mailto:adamkchow3@gmail.com">adamkchow3@gmail.com</a>
+    <a href="https://github.com/a-chow3" target="_blank" rel="noopener">github.com/a-chow3</a>
+  </div>
+  <div class="fine">© <span id="yr"></span> Adam Chow · Every number shown is fabricated for public display.</div>
+</div></footer>
+
+<script src="js/baseball-shiny.js"></script>
+<script>
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  var burger=document.getElementById('burger'),links=document.getElementById('navlinks');
+  burger.addEventListener('click',function(){links.classList.toggle('open');});
+</script>
+</body>
+</html>

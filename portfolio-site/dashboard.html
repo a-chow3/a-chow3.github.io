@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UVA MBB Performance Dashboard · Adam Chow</title>
+<meta name="description" content="Interactive case study: a Snowflake + Streamlit player-efficiency dashboard for UVA Men's Basketball. Live demo with fabricated dummy data." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+ .tl-item{display:block;padding:5px 2px;font-size:.85rem;color:#e8ecd2;cursor:pointer;}
+ .tl-item input{margin-right:8px;accent-color:var(--orange);}
+ #tlBox{max-height:170px;overflow:auto;background:#14261d;border:1px solid #294034;border-radius:8px;padding:8px 12px;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+ <div class="container">
+ <a class="brand" href="index.html" style="text-decoration:none">Adam<span>Chow</span></a>
+ <button class="burger" id="burger" aria-label="Menu">☰</button>
+ <div class="links" id="navlinks">
+ <a href="index.html#about">About</a>
+ <a href="index.html#skills">Skills</a>
+ <a href="index.html#projects">Projects</a>
+ <a href="index.html" class="btn-nav">← Home</a>
+ </div>
+ </div>
+</nav>
+
+<!-- CASE STUDY HERO -->
+<header class="cs-hero">
+ <div class="container">
+ <a href="index.html#projects" class="back">← Back to projects</a>
+ <span class="eyebrow">Basketball · Featured project</span>
+ <h1>UVA MBB Performance Dashboard</h1>
+ <p class="sub">A daily decision support tool that turns raw practice and game tracking data into a weighted
+ player efficiency index, shooting analytics, and head to head comparisons, built to help coaches make
+ faster, evidence based decisions on the court and in the lineup.</p>
+ <div class="cs-meta">
+ <div class="box"><div class="l">Role</div><div class="v">Data Scientist, sole builder</div></div>
+ <div class="box"><div class="l">Stack</div><div class="v">Snowflake · Streamlit · Python · pandas</div></div>
+ <div class="box"><div class="l">Audience</div><div class="v">Coaching &amp; performance staff</div></div>
+ <div class="box"><div class="l">Status</div><div class="v">In production · Aug 2025 to present</div></div>
+ </div>
+ </div>
+</header>
+
+<!-- OVERVIEW -->
+<section class="section">
+ <div class="container prose">
+ <div class="demo-banner">
+ <b>Interactive demo below.</b> The real dashboard runs on proprietary UVA tracking data inside Snowflake.
+ Everything shown here uses <b>fabricated dummy players and stats</b>. The analytics engine, weighting system,
+ and every calculation are the real thing. Only the data is synthetic.
+ </div>
+
+ <h2>Purpose</h2>
+ <p>
+ UVA's staff charts every practice and game with a detailed action tagging system, dozens of tracked events
+ per possession, from a good wall on defense to live ball turnovers. Raw, that data is unreadable.
+ The dashboard's job is to compress it into a single, trustworthy answer to the question coaches actually ask:
+ <em>who is helping us win, and in exactly which ways?</em>
+ </p>
+
+ <h2>Target audience</h2>
+ <p>
+ Coaches and performance staff who need answers in seconds between drills, not analysts. Every view is built
+ to be glanceable, with color coded indices, team relative percentiles, and plain language tiers instead of raw
+ z scores.
+ </p>
+
+ <h2>Methods</h2>
+ <h3>1 · A weighted action value model</h3>
+ <p>
+ Each of the roughly 60 tracked actions carries a point weight that reflects its impact on winning. I keep two
+ weighting systems that the user can toggle live: an original expert tuned set, and an <b>EPA set</b> (expected
+ points added) calibrated to possession outcomes. A player's offensive and defensive scores are the weighted
+ sums of their actions.
+ </p>
+ <h3>2 · Team-relative standardization</h3>
+ <p>
+ Raw scores don't travel across sample sizes, so I standardize each player's offensive and defensive score into
+ z scores against the team, then map those to an intuitive <b>Performance Index</b> (100 is team average, and
+ each standard deviation is worth about 34 points) using the normal CDF. Players then fall into tiers that run
+ from Very Poor all the way up to Elite.
+ </p>
+ <h3>3 · Shooting efficiency layer</h3>
+ <p>
+ A separate module computes True Shooting %, Effective FG%, FG%, and points per shot, each benchmarked against
+ the team average, plus a make and miss breakdown by shot type and a sortable team leaderboard.
+ </p>
+ <div class="callout">
+ <b>Design principle:</b> everything is filterable by date. Coaches can isolate a single practice, a road trip
+ stretch, or the full season, and every index, percentile, and chart recomputes against only the selected
+ events.
+ </div>
+
+ <h2>Process</h2>
+ <ul>
+ <li>Built an automated pipeline landing daily tagged practice &amp; game data into cleaned Snowflake tables.</li>
+ <li>Engineered the token to weight to category mapping, and the z score to index conversion, in pandas.</li>
+ <li>Designed a dark, glanceable Streamlit interface with live weight toggling, event filtering, and drill downs.</li>
+ <li>Iterated directly with coaching staff to tune weights, color thresholds, and which views mattered most.</li>
+ </ul>
+
+ <h2>Results</h2>
+ <div class="result-grid">
+ <div class="result"><div class="big">~60</div><div class="lbl">tracked actions distilled into one index</div></div>
+ <div class="result"><div class="big">Daily</div><div class="lbl">refresh supporting on court decisions</div></div>
+ <div class="result"><div class="big">2</div><div class="lbl">weighting systems, toggled live</div></div>
+ </div>
+ <p>
+ The dashboard is used by UVA's staff to inform lineup construction and player development conversations, giving
+ coaches a shared, objective vocabulary for performance that updates the morning after every session.
+ </p>
+
+ <h2>Skills demonstrated</h2>
+ <div class="chips">
+ <span class="chip">Snowflake</span><span class="chip">Streamlit</span><span class="chip">Python</span>
+ <span class="chip">pandas / NumPy</span><span class="chip">Statistical modeling</span><span class="chip">Z-score standardization</span>
+ <span class="chip">Data pipelines</span><span class="chip">Data visualization</span><span class="chip">UX for non technical users</span>
+ </div>
+ </div>
+</section>
+
+<!-- INTERACTIVE DASHBOARD -->
+<section class="section alt">
+ <div class="container">
+ <span class="eyebrow">Live demo · dummy data</span>
+ <h2 style="margin-bottom:6px;">Explore the dashboard</h2>
+ <p style="color:var(--muted);max-width:680px;margin-bottom:24px;">
+ Toggle the weighting system, filter which practices and games count, pick players, and drill into categories,
+ exactly like the production tool. All figures are synthetic.
+ </p>
+
+ <div class="dash">
+ <div class="dash-header">
+ <h2>UVA MBB Performance Dashboard</h2>
+ <div class="logo">UVA</div>
+ </div>
+ <div class="dash-sub">Player efficiency &amp; execution · demo build with fabricated data</div>
+
+ <!-- weight toggle -->
+ <div class="toggle-wrap">
+ <span style="font-weight:700;"> Weight System:</span>
+ <button id="weightBtn" class="toggle-btn original">Original</button>
+ <span id="weightNote" class="active-note original">Original Weights Active</span>
+ </div>
+
+ <!-- event filter -->
+ <details class="expander" style="margin-top:14px;" open>
+ <summary>Filter Events · <span id="evtCount">9</span> selected</summary>
+ <div class="exp-body">
+ <div style="display:flex;gap:10px;margin-bottom:6px;">
+ <button id="selAll" class="toggle-btn" style="background:#33503f;color:#fff;padding:6px 14px;">Select All</button>
+ <button id="clrAll" class="toggle-btn" style="background:#33503f;color:#fff;padding:6px 14px;">Clear All</button>
+ </div>
+ <div id="tlBox"></div>
+ </div>
+ </details>
+
+ <hr>
+
+ <!-- LEADERBOARD -->
+ <h3 class="sec" id="idxTitle">Player Performance Index</h3>
+ <p class="hint" style="margin-bottom:12px;">Overall index shaded green, where brighter is better. 100 is team average. Your selected player is highlighted.</p>
+ <div id="leaderboard" style="overflow-x:auto;"></div>
+ <details class="expander"><summary>How the Index is calculated</summary>
+ <div class="exp-body">
+ <b>1. Token counting.</b> Each action is counted per player from the selected events.<br>
+ <b>2. Weighted scoring.</b> Tokens times weights, positive for good actions and negative for errors.<br>
+ <b>3. Z scores.</b> Offensive and defensive scores standardized against the team.<br>
+ <b>4. Index.</b> Z scores become a percentile index using the normal CDF, where 100 is average and one standard deviation is about 34 points.
+ </div>
+ </details>
+
+ <hr>
+
+ <!-- TABS -->
+ <div class="dash-tabs">
+ <button class="dash-tab active" data-panel="panelPlayer">Player Analysis</button>
+ <button class="dash-tab" data-panel="panelShoot">Shooting Efficiency</button>
+ <button class="dash-tab" data-panel="panelCompare">Compare Players</button>
+ </div>
+
+ <!-- PLAYER ANALYSIS -->
+ <div id="panelPlayer" class="dash-panel active">
+ <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px;">
+ <div><label>Choose player</label><select id="playerSel"></select></div>
+ </div>
+ <div style="display:grid;grid-template-columns:1fr 260px;gap:24px;align-items:start;" class="pa-grid">
+ <div>
+ <h3 class="sec" style="font-size:1.05rem;"><span id="paPlayerName"></span> · Performance by Category</h3>
+ <div class="cat-bars" id="catBars"></div>
+ <div class="legend">
+ <span class="k"><span class="sw" style="background:var(--orange)"></span>Selected player</span>
+ <span class="k"><span class="sw" style="background:#2d6a4f"></span>Team range</span>
+ </div>
+ </div>
+ <div>
+ <h3 class="sec" style="font-size:1.05rem;">Summary</h3>
+ <div class="metric" style="margin-bottom:10px;"><div class="m-l">Total Score</div><div class="m-v" id="paTotal">…</div></div>
+ <div class="metric"><div class="m-l">Avg per Category</div><div class="m-v" id="paAvg">…</div></div>
+ <details class="expander"><summary>How is % calculated?</summary>
+ <div class="exp-body"><code>% = (Player − Min) / (Max − Min) × 100</code><br>
+ Positions the player within the team's range for that category. Greener = higher within the team.</div>
+ </details>
+ </div>
+ </div>
+ <hr>
+ <h3 class="sec" style="font-size:1.05rem;">Detailed Category Breakdown</h3>
+ <div style="margin-bottom:12px;"><label>Select category</label><select id="catSel"></select></div>
+ <div id="catBreakdown" style="overflow-x:auto;"></div>
+ </div>
+
+ <!-- SHOOTING -->
+ <div id="panelShoot" class="dash-panel">
+ <div class="shot-grid">
+ <div>
+ <h3 class="sec" style="font-size:1.05rem;">Shot Chart Breakdown</h3>
+ <div class="bar-chart" id="shotChart"></div>
+ <div class="legend" style="margin:10px 0 16px;">
+ <span class="k"><span class="sw" style="background:#12b76a;border-radius:2px"></span>Make</span>
+ <span class="k"><span class="sw" style="background:#e03131;border-radius:2px"></span>Miss</span>
+ </div>
+ <div class="shot-pcts" id="shotPcts"></div>
+ </div>
+ <div>
+ <h3 class="sec" style="font-size:1.05rem;">Efficiency Metrics</h3>
+ <div class="metric-row" style="grid-template-columns:1fr 1fr;" id="effMetrics"></div>
+ <details class="expander"><summary>How are these calculated?</summary>
+ <div class="exp-body">
+ <b>TS%</b> = <code>Pts / (2 × (FGA + 0.44 × FTA))</code><br>
+ <b>eFG%</b> = <code>(FGM + 0.5 × 3PM) / FGA</code><br>
+ <b>Pts/Shot</b> = <code>Pts / FGA</code>
+ </div>
+ </details>
+ </div>
+ </div>
+ <hr>
+ <h3 class="sec" style="font-size:1.05rem;">Team Shooting Comparison</h3>
+ <div id="teamShooting" style="overflow-x:auto;"></div>
+ </div>
+
+ <!-- COMPARE -->
+ <div id="panelCompare" class="dash-panel">
+ <h3 class="sec" style="font-size:1.05rem;">Head to Head Category Comparison</h3>
+ <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
+ <div><label>Player 1</label><select id="p1Sel"></select></div>
+ <div><label>Player 2</label><select id="p2Sel"></select></div>
+ </div>
+ <div class="compare-chart" id="compareChart"></div>
+ <p class="hint" id="cmpCaption" style="margin-top:14px;"></p>
+ </div>
+
+ </div>
+ </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+ <div class="container">
+ <h2>Want the full picture?</h2>
+ <p style="max-width:520px;">This is one project in a growing portfolio spanning baseball, basketball, and football analytics.</p>
+ <div class="social">
+ <a href="index.html">← Back to portfolio</a>
+ <a href="mailto:adamkchow3@gmail.com"> adamkchow3@gmail.com</a>
+ <a href="https://github.com/a-chow3" target="_blank" rel="noopener"> github.com/a-chow3</a>
+ <a href="https://linkedin.com/in/adamkchow" target="_blank" rel="noopener">in linkedin.com/in/adamkchow</a>
+ </div>
+ <div class="fine">© <span id="yr"></span> Adam Chow · All dashboard data shown is fabricated for public display.</div>
+ </div>
+</footer>
+
+<script>
+ document.getElementById('yr').textContent = new Date().getFullYear();
+ var burger=document.getElementById('burger'),links=document.getElementById('navlinks');
+ burger.addEventListener('click',function(){links.classList.toggle('open');});
+</script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
