@@ -113,7 +113,7 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a
 const rnd=mulberry32(31771);
 
 // SOM: 9x9 grid, 4 archetype regions blended
-const ARCH=[[ "Over the top", "#6f7a45",1.5,1.5],["High three quarter","#12b76a",7,2],["Low three quarter","#c68a4e",2,7],["Sidearm / sub","#7048e8",7,7]];
+const ARCH=[[ "Over the top", "#6f7a45",1.5,1.5],["High three quarter","#12b76a",7,2],["Low three quarter","#56726a",2,7],["Sidearm / sub","#7048e8",7,7]];
 const N=9, cell=38, pad=6;
 let s="";
 for(let r=0;r<N;r++)for(let c=0;c<N;c++){
@@ -136,7 +136,7 @@ document.getElementById("somLegend").innerHTML=ARCH.map(a=>`<div style="display:
 
 // feature importance
 const IMP=[["Whiff%",.20],["Release Height",".17"],["IVB",.15],["Extension",.13],["Chase%",.12],["Command+",.12],["Velo",.11]].map(x=>[x[0],+x[1]]);
-new Chart(document.getElementById("tpImp"),{type:"bar",data:{labels:IMP.map(i=>i[0]),datasets:[{data:IMP.map(i=>i[1]),backgroundColor:"#c68a4e"}]},
+new Chart(document.getElementById("tpImp"),{type:"bar",data:{labels:IMP.map(i=>i[0]),datasets:[{data:IMP.map(i=>i[1]),backgroundColor:"#56726a"}]},
  options:{indexAxis:"y",plugins:{legend:{display:false},title:{display:true,text:"Selected predictors"}},scales:{x:{max:.24}}}});
 
 // transfer table

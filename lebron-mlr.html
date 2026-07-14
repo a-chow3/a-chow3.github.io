@@ -144,7 +144,7 @@ document.getElementById("predTable").innerHTML=th+"</tbody>";
 // fit scatter
 const pts=[];for(let i=0;i<50;i++){const a=+(rnd()*8-2).toFixed(2);pts.push({x:a,y:+(a+(rnd()-.5)*2).toFixed(2)});}
 new Chart(document.getElementById("fitChart"),{type:"scatter",data:{datasets:[
- {label:"player",data:pts,backgroundColor:"#c68a4e",pointRadius:4},
+ {label:"player",data:pts,backgroundColor:"#56726a",pointRadius:4},
  {type:"line",label:"perfect",data:[{x:-2,y:-2},{x:6,y:6}],borderColor:"#1b4332",borderDash:[6,5],pointRadius:0}]},
  options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:"Actual LEBRON"}},y:{title:{display:true,text:"Predicted LEBRON"}}}}});
 </script>

@@ -154,7 +154,7 @@ function drawFrame(f){
  const pts=BASE.map(p=>rot3(p,f.rot[0],f.rot[1],f.rot[2]));
  const edges={x:[],y:[],z:[]};
  CONN.forEach(([a,b])=>{edges.x.push(pts[a][0],pts[b][0],null);edges.y.push(pts[a][1],pts[b][1],null);edges.z.push(pts[a][2],pts[b][2],null);});
- const bone={type:"scatter3d",mode:"lines",x:edges.x,y:edges.y,z:edges.z,line:{color:"#c68a4e",width:6},hoverinfo:"none"};
+ const bone={type:"scatter3d",mode:"lines",x:edges.x,y:edges.y,z:edges.z,line:{color:"#56726a",width:6},hoverinfo:"none"};
  const joints={type:"scatter3d",mode:"markers",x:pts.slice(0,21).map(p=>p[0]),y:pts.slice(0,21).map(p=>p[1]),z:pts.slice(0,21).map(p=>p[2]),
  marker:{size:5,color:"#6f7a45"},hoverinfo:"none"};
  const fore={type:"scatter3d",mode:"markers",x:[pts[21][0]],y:[pts[21][1]],z:[pts[21][2]],marker:{size:7,color:"#12b76a"},name:"forearm",hoverinfo:"none"};
@@ -165,7 +165,7 @@ function drawFrame(f){
  camera:{eye:{x:1.5,y:0.2,z:1.1}}}},{displayModeBar:false,responsive:true});
  document.getElementById("angleCards").innerHTML=
  card("Flexion / Extension",f.flex,"#6f7a45")+
- card("Pronation / Supination",f.pron,"#c68a4e")+
+ card("Pronation / Supination",f.pron,"#56726a")+
  card("Radial / Ulnar Deviation",f.dev,"#12b76a");
 }
 function card(label,[dir,val],col){

@@ -203,7 +203,7 @@
 document.getElementById('yr').textContent=new Date().getFullYear();
 var burger=document.getElementById('burger'),links=document.getElementById('navlinks');
 burger.addEventListener('click',function(){links.classList.toggle('open');});
-const OK=["#d4a373","#a7b17a","#009E73","#cdbf6a","#46512c","#a86a34","#CC79A7","#000000"];
+const OK=["#93ae8c","#a7b17a","#009E73","#cdbf6a","#46512c","#45635a","#CC79A7","#000000"];
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 const rn=mulberry32(2024);
 
@@ -226,7 +226,7 @@ const boxPlugin={id:"boxPlugin",afterDatasetsDraw(c){const {ctx,scales:{x,y}}=c;
     const yMin=y.getPixelForValue(st[0]),yMed=y.getPixelForValue(st[2]),yMax=y.getPixelForValue(st[4]);
     ctx.beginPath();ctx.moveTo(cx,yMin);ctx.lineTo(cx,y.getPixelForValue(st[1]));ctx.moveTo(cx,y.getPixelForValue(st[3]));ctx.lineTo(cx,yMax);ctx.stroke();
     ctx.beginPath();ctx.moveTo(cx-w,yMin);ctx.lineTo(cx+w,yMin);ctx.moveTo(cx-w,yMax);ctx.lineTo(cx+w,yMax);ctx.stroke();
-    ctx.strokeStyle="#d4a373";ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(cx-w,yMed);ctx.lineTo(cx+w,yMed);ctx.stroke();ctx.strokeStyle="#46512c";ctx.lineWidth=1.5;});
+    ctx.strokeStyle="#93ae8c";ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(cx-w,yMed);ctx.lineTo(cx+w,yMed);ctx.stroke();ctx.strokeStyle="#46512c";ctx.lineWidth=1.5;});
   ctx.restore();}};
 let boxChart;
 function drawBox(){

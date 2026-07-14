@@ -167,11 +167,11 @@ const ARCH=[
    summary:"Average bat speed, high tilt, line drive middle direction, deep contact, short swing.",
    weak:"North to south pitching. Splitters are the weakest spot, especially paired with the high fastball.",
    rv:[-0.6,1.2,-2.4]},
- {id:1,name:"Flat Pull",color:"#b3773a",
+ {id:1,name:"Flat Pull",color:"#45605a",
    summary:"Slightly below average bat speed, shortish, out in front swing, low line drives.",
    weak:"Splitter, sweeper, changeup. Trouble with horizontal break and deception.",
    rv:[1.0,-1.8,-2.0]},
- {id:2,name:"Backside Approach",color:"#c9a24b",
+ {id:2,name:"Backside Approach",color:"#93ae8c",
    summary:"Slow bat speed, average tilt, tight path with a deep contact point, long swing with an opposite field direction (more left handed hitters than right handed in this cluster).",
    weak:"Sweeper in over the hand, and the splitter, whose horizontal movement off the changeup can run into the bat path.",
    rv:[0.8,-2.2,-1.6]},
@@ -234,7 +234,7 @@ document.getElementById("vulnTable").innerHTML=vh+"</tbody>";
 /* Model 1: feature importance + classification output */
 const IMP=[["Bat Speed",.22],["Attack Angle",.19],["Swing Tilt",.16],["Contact Depth",.13],["Swing Length",.11],["wOBA",.10],["HardHit%",.09]];
 new Chart(document.getElementById("impChart"),{type:"bar",data:{labels:IMP.map(i=>i[0]),
-  datasets:[{label:"Importance",data:IMP.map(i=>i[1]),backgroundColor:"#c68a4e"}]},
+  datasets:[{label:"Importance",data:IMP.map(i=>i[1]),backgroundColor:"#56726a"}]},
   options:{indexAxis:"y",plugins:{legend:{display:false},title:{display:true,text:"Random Forest feature importance"}},scales:{x:{max:.28}}}});
 document.getElementById("clsOut").innerHTML=
 `<span class="m"># RandomForestClassifier, accuracy 0.86</span>
@@ -254,7 +254,7 @@ document.getElementById("clsOut").innerHTML=
 const reg=[];for(let i=0;i<40;i++){const a=(rnd()-.5)*6;reg.push({x:+a.toFixed(2),y:+(a+ (rnd()-.5)*2.1).toFixed(2)});}
 new Chart(document.getElementById("regChart"),{type:"scatter",data:{datasets:[
   {label:"pitch",data:reg,backgroundColor:"#6f7a45",pointRadius:4},
-  {type:"line",label:"perfect",data:[{x:-3.5,y:-3.5},{x:3.5,y:3.5}],borderColor:"#c68a4e",borderDash:[6,5],pointRadius:0}]},
+  {type:"line",label:"perfect",data:[{x:-3.5,y:-3.5},{x:3.5,y:3.5}],borderColor:"#56726a",borderDash:[6,5],pointRadius:0}]},
   options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:"Actual RV"}},y:{title:{display:true,text:"Predicted RV"}}}}});
 document.getElementById("regOut").innerHTML=
 `<span class="m"># GradientBoostingRegressor</span>

@@ -95,7 +95,7 @@
  <div id="treeWrap" style="overflow-x:auto;"></div>
  <div class="how-to"><b>How to read it:</b> follow the branches from the top. Each split is a metric threshold. A
  <span style="color:#5f6a34;font-weight:700">blue</span> leaf is a spot where the pitch favors the pitcher, an
- <span style="color:#c68a4e;font-weight:700">orange</span> leaf favors the hitter. The path to a blue leaf is the
+ <span style="color:#56726a;font-weight:700">orange</span> leaf favors the hitter. The path to a blue leaf is the
  execution target: hit these velocity, movement, and location marks and the pitch plays.</div>
  </div>
 </div></section>
@@ -118,7 +118,7 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a
 const rnd=mulberry32(49607);
 
 // KMeans scatter: x=expected value, y=actual value, 4 clusters
-const centers=[[1.4,1.5,"#12b76a","Elite value (top cluster)"],[0.4,0.5,"#6f7a45","Solid"],[-0.5,-0.3,"#b3773a","Below"],[-1.4,-1.4,"#adb5bd","Replacement"]];
+const centers=[[1.4,1.5,"#12b76a","Elite value (top cluster)"],[0.4,0.5,"#6f7a45","Solid"],[-0.5,-0.3,"#45605a","Below"],[-1.4,-1.4,"#adb5bd","Replacement"]];
 const kmSets=centers.map(c=>{const pts=[];for(let i=0;i<22;i++)pts.push({x:+(c[0]+(rnd()-.5)*1.1).toFixed(2),y:+(c[1]+(rnd()-.5)*1.1).toFixed(2)});
  return {label:c[3],data:pts,backgroundColor:c[2],pointRadius:c[2]==="#12b76a"?6:4,pointStyle:c[2]==="#12b76a"?"rectRot":"circle"};});
 new Chart(document.getElementById("kmChart"),{type:"scatter",data:{datasets:kmSets},
@@ -146,7 +146,7 @@ const TREES={
  n:{node:"Arm-side run > 12 in ?",y:{leaf:"pitcher",txt:"PES 61 · movement saves it"},n:{leaf:"hitter",txt:"PES 33 · no separation"}}}
 };
 function leafBox(x,y,leaf,txt){
- const col=leaf==="pitcher"?"#5f6a34":"#c68a4e";
+ const col=leaf==="pitcher"?"#5f6a34":"#56726a";
  return `<rect x="${x-80}" y="${y}" width="160" height="46" rx="8" fill="${col}"/>
  <text x="${x}" y="${y+19}" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">${leaf==="pitcher"?"Favors pitcher":"Favors hitter"}</text>
  <text x="${x}" y="${y+36}" text-anchor="middle" fill="#fff" font-size="10.5">${txt}</text>`;
