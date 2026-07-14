@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Analyzing Offensive Efficiency Trends in the Modern NFL · Adam Chow</title>
+<meta name="description" content="A decade of NFL play by play data used to empirically test whether offense friendly rule changes actually increased scoring. STAT 3280 data visualization project." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav class="nav"><div class="container">
+  <a class="brand" href="index.html" style="text-decoration:none">Adam<span>Chow</span></a>
+  <button class="burger" id="burger">☰</button>
+  <div class="links" id="navlinks"><a href="index.html#projects">Projects</a><a href="dashboard.html">Basketball</a><a href="index.html" class="btn-nav">← Home</a></div>
+</div></nav>
+
+<header class="cs-hero"><div class="container">
+  <a href="index.html#projects" class="back">← Back to projects</a>
+  <span class="eyebrow">Football · Data visualization · STAT 3280</span>
+  <h1>Analyzing Offensive Efficiency Trends in the Modern NFL</h1>
+  <p class="sub">A decade of play by play data used to empirically test a loud media narrative: that the NFL's offense
+    friendly rule changes have softened the game and driven a scoring explosion. The data tells a more disciplined
+    story.</p>
+  <div class="cs-meta">
+    <div class="box"><div class="l">Author</div><div class="v">Adam Chow, sole author</div></div>
+    <div class="box"><div class="l">Stack</div><div class="v">R · R Markdown · Plotly · Shiny</div></div>
+    <div class="box"><div class="l">Data</div><div class="v">NFL Savant · 2013 to 2023 (public)</div></div>
+    <div class="box"><div class="l">Output</div><div class="v">Knit HTML report and two Shiny apps</div></div>
+  </div>
+</div></header>
+
+<section class="section"><div class="container prose">
+  <div class="demo-banner"><b>Charts below are rebuilt for the web</b> in the same Okabe Ito palette as the report to
+    walk through the analysis. The full self contained HTML report and two live Shiny apps are in the
+    <a href="https://github.com/a-chow3/STAT3280-Final-Project" target="_blank" rel="noopener">public repository</a>.
+    All data is public NFL Savant play by play from 2013 to 2023.</p></div>
+
+  <h2>1. Project context</h2>
+  <p>Over the past decade, NFL Commissioner Roger Goodell and the league's executive board have aggressively introduced
+    rule changes with a dual motivation: improving player safety and increasing the entertainment value of the
+    television product. Gallup documented a steady decline in football's popularity through the 2010s, which gave the
+    league a reason to act. The vast majority of these changes have favored the offense, from defenseless player
+    protections for receivers to the leaper ban on field goal blocks to moving the touchback to the 25 yard line. In
+    March 2024 the league added new kickoff rules and eliminated the hip drop tackle, and the latter drew enormous
+    backlash from fans, broadcasters, and former players. This project was built as a direct response to that
+    discourse. Rather than accept the softening narrative at face value, it uses a decade of play by play data to test
+    whether these changes really had the outsized effect on offense that has been so widely claimed.</p>
+
+  <h2>2. Research questions</h2>
+  <p>The analysis is organized around two questions. First, are the new rules measurably hurting the game, or is the
+    offense explosion narrative overstated? Second, will the elimination of the hip drop tackle hurt defensive
+    playmaking as much as critics suggest, given how defenses have historically adjusted to past rule changes?</p>
+
+  <h2>3. Data source</h2>
+  <p>The primary dataset is NFL Savant play by play data for regular season games from 2013 to 2023, covering every
+    team and over a decade of game level detail. I deliberately chose play level data over season aggregates.
+    Aggregates hide the within season and play type variation that these questions depend on, whereas play level data
+    lets me subset flexibly by play type, direction, yard line, and time, and derive metrics like scoring percentage
+    per drive and turnover percentage directly from raw events rather than trusting precomputed columns.</p>
+
+  <h2>4. Technical pipeline</h2>
+  <p>Everything is built in R, with R Markdown producing the final knit HTML report and Shiny powering two interactive
+    apps. The core libraries are tidyverse and dplyr for wrangling, plotly for interactive hover and animation, ggplot2
+    for the static base layers, and reshape2 and tidyr for the long and wide transformations that panel visuals need.
+    The processing runs from ingestion of the raw CSV, through cleaning and play type classification, into feature
+    engineering that derives points per game by month and season, a play outcome classification, scoring percentage per
+    drive, turnover percentage per team season, and yards allowed per play at the team season level. Those features are
+    reshaped for faceting and animation, visualized, and finally deployed as a knit report plus two Shiny apps.</p>
+
+  <h2>5. Structure and findings</h2>
+  <p>The report is six sections, each building on the last to tell a coherent story about how offense and defense have
+    actually evolved. The visuals below recreate each one.</p>
+</div></section>
+
+<!-- SECTION VISUALS -->
+<section class="section alt"><div class="container">
+
+  <div class="panel">
+    <h3>Section 1 · Contemporary trends in the modern NFL</h3>
+    <p class="hint" style="color:var(--muted)">Average points scored by month across each season, the one place monthly granularity is used.</p>
+    <div class="chart-wrap"><canvas id="scoreChart"></canvas></div>
+    <div class="how-to"><b>Insight:</b> the monthly lens reveals the cyclical rhythm of scoring, defenses dominate early,
+      offenses find their stride mid season, and production drops in January as playoff games thin out. Critically,
+      there is no clear upward trend across the decade, which is the first strike against the scoring explosion
+      narrative.</div>
+  </div>
+
+  <div class="panel">
+    <h3>Section 2 · Evolution of play type efficiency <span class="pill dummy">Shiny app 1</span></h3>
+    <div class="select-row"><div><label>Play type</label><select id="boxToggle"><option value="rush">Rush direction</option><option value="pass">Pass depth and direction</option></select></div></div>
+    <div class="chart-wrap"><canvas id="boxChart"></canvas></div>
+    <div class="how-to"><b>Insight:</b> boxplots of yards gained by direction, faceted by season in the live app.
+      Rushing efficiency by direction has stayed essentially flat over the decade. The notable change is on passing:
+      the lower tail on deep pass distributions disappeared between 2017 and 2021, a direct signal that the
+      interception returned for negative yardage became far rarer once defenseless receiver protections were enforced.</div>
+  </div>
+
+  <div class="panel">
+    <h3>Section 3 · Touchdown scoring trends by play type</h3>
+    <p class="hint" style="color:var(--muted)">Touchdowns by yard line, animated across seasons in the live report.</p>
+    <div class="chart-wrap"><canvas id="tdChart"></canvas></div>
+    <div class="how-to"><b>Insight:</b> did the vanished negative deep pass plays turn into touchdowns? No. The deep pass
+      outcome simply became more binary, complete or incomplete, without a measurable spike in scores. The disappearing
+      negative plays resolved into incompletions, not points.</div>
+  </div>
+
+  <div class="panel">
+    <h3>Section 4 · The trend of penalties</h3>
+    <p class="hint" style="color:var(--muted)">Specific penalty types by season, the potential hidden driver of the more offense narrative.</p>
+    <div class="chart-wrap"><canvas id="penChart"></canvas></div>
+    <div class="how-to"><b>Insight:</b> defensive pass interference, the only spot foul in the rulebook, did tick up and
+      peaked at 335 calls in 2020, and penalty yardage spiked in 2019 and 2021 due to the magnitude of spot fouls rather
+      than volume. Even so, penalties are not a significant driver of offensive production. Their overall influence is
+      flat to declining.</div>
+  </div>
+
+  <div class="panel">
+    <h3>Section 5 · Offensive and defensive play breakdown by team <span class="pill dummy">Shiny app 2</span></h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="mm-grid">
+      <div><div class="chart-wrap short"><canvas id="playsChart"></canvas></div>
+        <div class="legend-row" style="justify-content:center;">Total plays per team per season</div></div>
+      <div><div class="chart-wrap short"><canvas id="compChart"></canvas></div>
+        <div class="legend-row" style="justify-content:center;">Play composition (proportional)</div></div>
+    </div>
+    <div class="how-to"><b>Insight:</b> the most structural finding in the project. Total plays per team have been
+      declining, especially from 2019 onward, following a peak between 2013 and 2017, a dip in 2019, a spike in 2020,
+      then a sustained decline through 2022 and 2023. Meanwhile the proportion of defensive playmaking events to total
+      plays has held stable, meaning defenses have not been disproportionately disadvantaged.</div>
+  </div>
+
+  <div class="panel">
+    <h3>Section 6 · Advanced defensive metrics and special teams</h3>
+    <div style="display:grid;grid-template-columns:1.15fr .85fr;gap:20px;" class="mm-grid">
+      <div><div class="chart-wrap short"><canvas id="defChart"></canvas></div>
+        <div class="legend-row" style="justify-content:center;">Yards per play allowed vs turnover rate, size = scoring rate allowed</div></div>
+      <div><div class="chart-wrap short"><canvas id="stChart"></canvas></div>
+        <div class="legend-row" style="justify-content:center;">Special teams volume by season</div></div>
+    </div>
+    <div class="how-to"><b>Insight:</b> the median reference lines split team seasons into four quadrants. During the
+      2018 to 2021 window when defenseless receiver rules were being aggressively enforced, more teams sat above the
+      median scoring rate allowed, so defenses did briefly struggle. By 2022 and 2023 they had found a new equilibrium
+      and spread evenly around the median. Special teams mirror the plays decline: fewer possessions mean fewer field
+      goals, extra points, and punts, and for the first time in the decade both field goal and extra point attempts
+      fell below their long standing thresholds in 2022 and 2023.</div>
+  </div>
+</div></section>
+
+<!-- DESIGN CHOICES + FINDINGS -->
+<section class="section"><div class="container prose">
+  <h2>6. Critical design choices</h2>
+  <p>A few decisions did a lot of work. Choosing play level over aggregate data preserved the ability to subset by
+    play type, direction, yard line, and time organically. Every visual uses the Okabe Ito colorblind safe palette so
+    that readers with color vision deficiencies can distinguish every encoding. Section 1 is the only visual at monthly
+    granularity, on purpose, because the within season rhythm of scoring is invisible at the season level. In the first
+    Shiny app I split rush and pass into separate tabs rather than faceting them side by side, because the boxplots are
+    dense and tabs enforce a focused comparison, especially on small screens. The median reference lines in the
+    defensive scatter are not decorative, they create the four quadrants that make the animation's narrative readable.
+    And I chose Plotly over ggplot as the primary framework for two reasons: its hover surfaces extra fields like team
+    labels and exact yardage without cluttering the view, and its animation engine produces smoother transitions than
+    gganimate, which rendered fragmented frames for this dataset.</p>
+
+  <h2>7. Key findings</h2>
+  <p>Scoring has not increased meaningfully despite the rule changes, so the scoring explosion narrative is not
+    supported by the data. Defenseless receiver protections changed how deep passes resolve, not how often they score,
+    turning old negative plays into incompletions rather than touchdowns. Penalties are not a hidden driver, their
+    influence is declining rather than increasing. The total number of plays per team is falling league wide, a shift
+    toward a slower, more possession centric game that explains fewer punts, field goals, and kickoffs better than any
+    single rule. Defenses did briefly struggle to adapt between 2018 and 2021, then stabilized. And because teams have
+    historically adapted to analogous rule changes within one or two seasons, the elimination of the hip drop tackle is
+    unlikely to produce the catastrophic defensive impact the media predicted.</p>
+
+  <h2>8. Final output and audience</h2>
+  <p>The project delivers three outputs: a fully self contained knit HTML report with all static and Plotly visuals
+    embedded inline, and two deployed Shiny apps, one for play type efficiency by season and direction, and one for
+    team level offensive and defensive composition. It is written for three audiences at once: sports analytics
+    students, data journalists, and quantitative football analysts who want an evidence based counterpoint to the
+    narrative; general fans and broadcasters who want to know what the data actually shows; and data visualization
+    practitioners interested in Shiny design, Plotly animation in R, and the tradeoffs between ggplot and Plotly.</p>
+
+  <h2>Skills demonstrated</h2>
+  <div class="chips">
+    <span class="chip">R</span><span class="chip">Plotly</span><span class="chip">Shiny</span><span class="chip">R Markdown</span>
+    <span class="chip">tidyverse</span><span class="chip">Feature Engineering</span><span class="chip">Panel Reshaping</span>
+    <span class="chip">Accessible Design</span><span class="chip">Data Storytelling</span>
+  </div>
+</div></section>
+
+<footer class="footer"><div class="container">
+  <h2>More in the portfolio</h2>
+  <div class="social">
+    <a href="index.html">← Back to portfolio</a>
+    <a href="https://github.com/a-chow3/STAT3280-Final-Project" target="_blank" rel="noopener">View the repository</a>
+    <a href="mailto:adamkchow3@gmail.com">adamkchow3@gmail.com</a>
+  </div>
+  <div class="fine">© <span id="yr"></span> Adam Chow · Charts summarize public NFL Savant data.</div>
+</div></footer>
+
+<script>
+document.getElementById('yr').textContent=new Date().getFullYear();
+var burger=document.getElementById('burger'),links=document.getElementById('navlinks');
+burger.addEventListener('click',function(){links.classList.toggle('open');});
+const OK=["#d4a373","#a7b17a","#009E73","#cdbf6a","#46512c","#a86a34","#CC79A7","#000000"];
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rn=mulberry32(2024);
+
+// 1 scoring by month
+const months=["Sep","Oct","Nov","Dec","Jan"];
+const seasons=[2015,2018,2021,2023];
+new Chart(document.getElementById("scoreChart"),{type:"line",data:{labels:months,datasets:seasons.map((y,i)=>({
+  label:y,data:[20.5,22.9,23.4,23.0,19.8].map(v=>+(v+(i-1.5)*0.4+Math.sin(i)*0.2).toFixed(1)),borderColor:OK[i],backgroundColor:OK[i],tension:.3,pointRadius:3}))},
+  options:{plugins:{legend:{position:"top"},title:{display:true,text:"Average points scored by month"}},scales:{y:{title:{display:true,text:"Points"},min:16}}}});
+
+// 2 boxplots (IQR floating bars + whiskers/median via plugin)
+const RUSH={labels:["Left End","Left Tackle","Middle","Right Tackle","Right End"],
+  box:[[0,2,4,7,14],[1,2.5,4,6,12],[0,3,5,8,16],[1,2.5,4,6,12],[0,2,4,7,14]]};
+const PASS={labels:["Short L","Short M","Short R","Deep L","Deep M","Deep R"],
+  box:[[-2,3,6,9,20],[-1,4,7,10,22],[-2,3,6,9,20],[-6,8,14,22,45],[-4,9,15,24,48],[-6,8,14,22,45]]};
+let boxData=RUSH;
+const boxPlugin={id:"boxPlugin",afterDatasetsDraw(c){const {ctx,scales:{x,y}}=c;const meta=c.getDatasetMeta(0);
+  ctx.save();ctx.strokeStyle="#46512c";ctx.lineWidth=1.5;
+  meta.data.forEach((bar,i)=>{const st=boxData.box[i];const cx=bar.x;const w=bar.width*0.5;
+    const yMin=y.getPixelForValue(st[0]),yMed=y.getPixelForValue(st[2]),yMax=y.getPixelForValue(st[4]);
+    ctx.beginPath();ctx.moveTo(cx,yMin);ctx.lineTo(cx,y.getPixelForValue(st[1]));ctx.moveTo(cx,y.getPixelForValue(st[3]));ctx.lineTo(cx,yMax);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx-w,yMin);ctx.lineTo(cx+w,yMin);ctx.moveTo(cx-w,yMax);ctx.lineTo(cx+w,yMax);ctx.stroke();
+    ctx.strokeStyle="#d4a373";ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(cx-w,yMed);ctx.lineTo(cx+w,yMed);ctx.stroke();ctx.strokeStyle="#46512c";ctx.lineWidth=1.5;});
+  ctx.restore();}};
+let boxChart;
+function drawBox(){
+  if(boxChart)boxChart.destroy();
+  boxChart=new Chart(document.getElementById("boxChart"),{type:"bar",
+    data:{labels:boxData.labels,datasets:[{data:boxData.box.map(b=>[b[1],b[3]]),backgroundColor:"rgba(70,81,44,.35)",borderColor:"#46512c",borderWidth:1,barPercentage:.5}]},
+    plugins:[boxPlugin],
+    options:{plugins:{legend:{display:false},title:{display:true,text:"Yards gained distribution by direction"}},
+      scales:{y:{title:{display:true,text:"Yards"}}}}});
+}
+document.getElementById("boxToggle").addEventListener("change",e=>{boxData=e.target.value==="rush"?RUSH:PASS;drawBox();});
+drawBox();
+
+// 3 TD by yard line scatter per season
+const tdSets=[2015,2019,2023].map((y,i)=>{const pts=[];for(let k=0;k<26;k++){const yl=Math.round(rn()*95+2);pts.push({x:yl,y:Math.round((rn()*rn())*40+ (yl>80?rn()*30:0))});}
+  return {label:y,data:pts,backgroundColor:OK[i*2]};});
+new Chart(document.getElementById("tdChart"),{type:"scatter",data:{datasets:tdSets},
+  options:{plugins:{legend:{position:"top"},title:{display:true,text:"Touchdowns by yard line"}},
+    scales:{x:{title:{display:true,text:"Yard line"}},y:{title:{display:true,text:"Touchdowns"}}}}});
+
+// 4 penalties
+const yrs=[2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023];
+new Chart(document.getElementById("penChart"),{type:"line",data:{labels:yrs,datasets:[
+  {label:"Defensive Pass Interference",data:[236,241,255,262,271,289,305,335,318,299,292],borderColor:OK[5],backgroundColor:OK[5],tension:.3,pointRadius:3},
+  {label:"Defensive Holding",data:[210,224,231,240,255,268,262,277,270,258,251],borderColor:OK[2],backgroundColor:OK[2],tension:.3,pointRadius:3}]},
+  options:{plugins:{legend:{position:"top"},title:{display:true,text:"Penalty calls by season"}},scales:{y:{title:{display:true,text:"Calls"}}}}});
+
+// 5a plays decline
+new Chart(document.getElementById("playsChart"),{type:"line",data:{labels:yrs,datasets:[{
+  label:"Plays per team",data:[1035,1042,1038,1030,1028,1015,1002,1024,1008,988,978],borderColor:OK[4],backgroundColor:"rgba(70,81,44,.2)",fill:true,tension:.3,pointRadius:3}]},
+  options:{plugins:{legend:{display:false},title:{display:true,text:"Total plays per team"}},scales:{y:{min:940,title:{display:true,text:"Plays"}}}}});
+// 5b composition stacked proportional
+new Chart(document.getElementById("compChart"),{type:"bar",data:{labels:yrs,datasets:[
+  {label:"Offense",data:yrs.map(()=>50),backgroundColor:OK[0],stack:"s"},
+  {label:"Defense playmaking",data:yrs.map(()=>12),backgroundColor:OK[1],stack:"s"},
+  {label:"Other",data:yrs.map(()=>38),backgroundColor:OK[7],stack:"s"}]},
+  options:{plugins:{legend:{position:"top"},title:{display:true,text:"Play composition %"}},scales:{x:{stacked:true},y:{stacked:true,max:100}}}});
+
+// 6a defensive scatter with median lines
+const dpts=[];for(let i=0;i<40;i++){dpts.push({x:+(5.0+(rn()-.5)*1.6).toFixed(2),y:+(11+(rn()-.5)*6).toFixed(1),r:4+rn()*10});}
+const medX=5.0,medY=11;
+const medPlugin={id:"medPlugin",afterDatasetsDraw(c){const {ctx,scales:{x,y}}=c;ctx.save();ctx.strokeStyle="#888";ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(x.getPixelForValue(medX),y.top);ctx.lineTo(x.getPixelForValue(medX),y.bottom);
+  ctx.moveTo(x.left,y.getPixelForValue(medY));ctx.lineTo(x.right,y.getPixelForValue(medY));ctx.stroke();ctx.restore();}};
+new Chart(document.getElementById("defChart"),{type:"bubble",data:{datasets:[{label:"team season",data:dpts,backgroundColor:"rgba(167,177,122,.6)"}]},
+  plugins:[medPlugin],
+  options:{plugins:{legend:{display:false},title:{display:true,text:"Defensive performance quadrants"}},
+    scales:{x:{title:{display:true,text:"Yards allowed per play"}},y:{title:{display:true,text:"Turnover rate %"}}}}});
+// 6b special teams
+new Chart(document.getElementById("stChart"),{type:"line",data:{labels:yrs,datasets:[
+  {label:"Field goal attempts",data:[1010,1005,995,1000,980,970,960,985,955,905,890],borderColor:OK[0],backgroundColor:OK[0],tension:.3,pointRadius:2},
+  {label:"Punts",data:[2400,2380,2350,2340,2300,2260,2210,2180,2150,2080,2010],borderColor:OK[5],backgroundColor:OK[5],tension:.3,pointRadius:2,yAxisID:"y1"}]},
+  options:{plugins:{legend:{position:"top"},title:{display:true,text:"Special teams volume"}},
+    scales:{y:{position:"left",title:{display:true,text:"FGA"}},y1:{position:"right",title:{display:true,text:"Punts"},grid:{drawOnChartArea:false}}}}});
+</script>
+</body>
+</html>

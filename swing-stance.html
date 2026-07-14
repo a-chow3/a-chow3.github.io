@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Swing and Stance Clustering · Adam Chow</title>
+<meta name="description" content="Case study: clustering MLB hitters into swing and stance archetypes, plus predictive models for archetype, run value, and tier progression." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav class="nav"><div class="container">
+  <a class="brand" href="index.html" style="text-decoration:none">Adam<span>Chow</span></a>
+  <button class="burger" id="burger">☰</button>
+  <div class="links" id="navlinks"><a href="index.html#projects">Projects</a><a href="baseball-shiny.html">Baseball</a><a href="index.html" class="btn-nav">← Home</a></div>
+</div></nav>
+
+<header class="cs-hero"><div class="container">
+  <a href="index.html#projects" class="back">← Back to projects</a>
+  <span class="eyebrow">Baseball · Machine learning · Tread Athletics</span>
+  <h1>Swing and Stance Clustering</h1>
+  <p class="sub">Group hitters into swing and stance archetypes, learn how each archetype performs against every pitch,
+    then layer on predictive models that classify a hitter, forecast run value, and map the path to the next tier.</p>
+  <div class="cs-meta">
+    <div class="box"><div class="l">Role</div><div class="v">Analyst, end to end build</div></div>
+    <div class="box"><div class="l">Stack</div><div class="v">Python · scikit learn · pandas · matplotlib</div></div>
+    <div class="box"><div class="l">Audience</div><div class="v">Coaches, players, player development</div></div>
+    <div class="box"><div class="l">Data</div><div class="v">Baseball Savant (public)</div></div>
+  </div>
+</div></header>
+
+<section class="section"><div class="container prose">
+  <div class="demo-banner"><b>The archetypes below are my real findings from the June 9, 2025 snapshot.</b> The scatter
+    positions and model outputs use <span class="pill dummy">dummy values</span> for public display, but the archetype
+    names, summaries, and weaknesses are the genuine article. Full notes live in the
+    <a href="https://github.com/a-chow3/Baseball-Swing-and-Stance-Clustering" target="_blank" rel="noopener">public repository</a>.</p></div>
+
+  <h2>Purpose</h2>
+  <p>Two hitters can post the same batting line and be nothing alike. This project groups hitters by how they actually
+    move, their stance and swing mechanics, to surface distinct hitting archetypes. Once you can name a hitter's type,
+    you can tailor pitch sequences and matchups against it, and you can coach toward it.</p>
+
+  <h2>Target audience</h2>
+  <p>Coaches and player development staff who want a shared vocabulary for swings, and analysts who want a defensible
+    way to segment hitters that goes beyond raw results.</p>
+
+  <h2>Methods</h2>
+  <p>I scraped stance, swing, batted ball, and value data from Baseball Savant and merged it into one player table.
+    After cleaning and standardizing the mechanical features, I fit Gaussian Mixture Models and compared them against
+    K Means, using PCA to project the high dimensional swing space into two readable dimensions. Each cluster gets a
+    reference profile of mean and spread for every metric. From there I built pitch level analysis, a vulnerability
+    matrix, and three predictive models described below.</p>
+
+  <h2>Results</h2>
+  <p>The June 9, 2025 run produced ten swing archetypes, each with a clear identity, a scouting weakness, and a plan of
+    attack. Together with the predictive models, they turn a wall of numbers into a language a coach can use in a
+    hitters meeting.</p>
+
+  <h2>Skills demonstrated</h2>
+  <div class="chips">
+    <span class="chip">GMM and K Means</span><span class="chip">PCA</span><span class="chip">Random Forest</span>
+    <span class="chip">Gradient Boosting</span><span class="chip">Logistic Regression</span><span class="chip">KNN Imputation</span>
+    <span class="chip">Feature Engineering</span><span class="chip">Web Scraping</span><span class="chip">Data Visualization</span>
+  </div>
+</div></section>
+
+<!-- CLUSTERING -->
+<section class="section alt"><div class="container">
+  <span class="eyebrow">Part 1 · Clustering and archetypes</span>
+  <h2>Ten swing archetypes (June 9, 2025)</h2>
+
+  <div class="panel">
+    <h3>PCA view of swing clusters</h3>
+    <div class="chart-wrap"><canvas id="pcaChart"></canvas></div>
+    <div class="how-to"><b>How to read it:</b> each dot is a hitter, placed by a two dimensional PCA projection of their
+      swing mechanics. Color is the archetype the model assigned. Tight, separated colors mean the archetypes are real
+      rather than arbitrary cuts. Swings sit in this space, not stances, because swings vary far more. Notice archetype
+      9 sitting alone, a single player cluster and a genuine outlier.</div>
+  </div>
+
+  <div class="panel">
+    <h3>Archetype profiles</h3>
+    <p class="hint" style="color:var(--muted)">Each card is a real archetype from the June 9 run, with its summary and the scouting weakness that drives a plan of attack.</p>
+    <div class="arch-grid" id="archGrid"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Vulnerability matrix</h3>
+    <p class="hint" style="color:var(--muted)">Run value per 100 pitches for each archetype against each pitch family. Positive favors the hitter, negative favors the pitcher.</p>
+    <div style="overflow-x:auto;"><table class="dtable-lite" id="vulnTable"></table></div>
+    <div class="how-to"><b>How to read it:</b> find the archetype, then scan its row for the coldest cell. That is the
+      pitch family to lean on. The matrix lines up with each archetype's written weakness, so it is the bridge from a
+      named cluster to a concrete attack plan a coach can call.</div>
+  </div>
+</div></section>
+
+<!-- PREDICTIVE MODELING -->
+<section class="section"><div class="container">
+  <span class="eyebrow">Part 2 · Predictive modeling</span>
+  <h2>Three models, three jobs</h2>
+  <p style="color:var(--muted);max-width:720px;">This is the part I most like to show, because it moves from describing
+    hitters to predicting and directing. Every output below is a dummy run in the real format.</p>
+
+  <div class="panel">
+    <h3>Model 1 · Swing archetype classifier <span class="pill dummy">demo</span></h3>
+    <p class="hint" style="color:var(--muted)">A Random Forest that reads a hitter's mechanics and results and returns their most likely archetype. A KNN imputer (k = 5) fills gaps using the five most similar players.</p>
+    <div style="display:grid;grid-template-columns:1.1fr .9fr;gap:22px;" class="mm-grid">
+      <div><div class="chart-wrap short"><canvas id="impChart"></canvas></div>
+        <div class="legend-row" style="justify-content:center;">Feature importance</div></div>
+      <div class="model-out" id="clsOut"></div>
+    </div>
+    <div class="how-to"><b>How to read it:</b> the bars rank which inputs drive the classification. The console shows a
+      single prediction: the model's top archetype for a test hitter and the probability spread across the others. A
+      high top probability means a clean, confident type. A flatter spread means a hybrid swing.</div>
+  </div>
+
+  <div class="panel">
+    <h3>Model 2 · Run value by pitch type <span class="pill dummy">demo</span></h3>
+    <p class="hint" style="color:var(--muted)">A Gradient Boosting Regressor that estimates the expected run value of a
+      pitch type against a hitter. Trained on an 80 / 20 split with 500 estimators, a 0.02 learning rate, and max depth 6.</p>
+    <div style="display:grid;grid-template-columns:.9fr 1.1fr;gap:22px;" class="mm-grid">
+      <div class="model-out" id="regOut"></div>
+      <div><div class="chart-wrap short"><canvas id="regChart"></canvas></div>
+        <div class="legend-row" style="justify-content:center;">Predicted vs actual run value</div></div>
+    </div>
+    <div class="how-to"><b>How to read it:</b> I hand weighted the inputs so wOBA and slugging carry the most signal and
+      noisier rates like whiff carry less. Points near the diagonal line mean the model's predicted run value matched
+      what really happened. The tighter that cloud, the more you can trust the pitch level forecast.</div>
+  </div>
+
+  <div class="panel">
+    <h3>Model 3 · Tier progression <span class="pill dummy">demo</span></h3>
+    <p class="hint" style="color:var(--muted)">Players sit in six tiers from Poor to Superstar. This model answers a
+      forward looking question: what should player X change to reach the next tier? It compares a hitter to those who
+      already succeed above them using t tests and Cohen's d.</p>
+    <div style="overflow-x:auto;"><table class="dtable-lite" id="progTable"></table></div>
+    <div class="how-to"><b>How to read it:</b> each row is an adjustment that most separates the target tier from the
+      current one, ranked by effect size. A larger Cohen's d means a bigger, more reliable gap. These are starting
+      points for training focus, not promises, since every hitter is different. Random Forest and Gradient Boosting
+      rank the signal, and a multinomial Logistic Regression turns it into readable benchmarks for staff.</div>
+  </div>
+</div></section>
+
+<footer class="footer"><div class="container">
+  <h2>More in the portfolio</h2>
+  <div class="social">
+    <a href="index.html">← Back to portfolio</a>
+    <a href="https://github.com/a-chow3/Baseball-Swing-and-Stance-Clustering" target="_blank" rel="noopener">View the repository</a>
+    <a href="mailto:adamkchow3@gmail.com">adamkchow3@gmail.com</a>
+  </div>
+  <div class="fine">© <span id="yr"></span> Adam Chow · Scatter positions and model figures are fabricated for public display.</div>
+</div></footer>
+
+<script>
+document.getElementById('yr').textContent=new Date().getFullYear();
+var burger=document.getElementById('burger'),links=document.getElementById('navlinks');
+burger.addEventListener('click',function(){links.classList.toggle('open');});
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rnd=mulberry32(60925);
+
+/* Real archetypes from the June 9, 2025 run */
+const ARCH=[
+ {id:0,name:"Textbook A to B",color:"#e03131",
+   summary:"Average bat speed, high tilt, line drive middle direction, deep contact, short swing.",
+   weak:"North to south pitching. Splitters are the weakest spot, especially paired with the high fastball.",
+   rv:[-0.6,1.2,-2.4]},
+ {id:1,name:"Flat Pull",color:"#b3773a",
+   summary:"Slightly below average bat speed, shortish, out in front swing, low line drives.",
+   weak:"Splitter, sweeper, changeup. Trouble with horizontal break and deception.",
+   rv:[1.0,-1.8,-2.0]},
+ {id:2,name:"Backside Approach",color:"#c9a24b",
+   summary:"Slow bat speed, average tilt, tight path with a deep contact point, long swing with an opposite field direction (more left handed hitters than right handed in this cluster).",
+   weak:"Sweeper in over the hand, and the splitter, whose horizontal movement off the changeup can run into the bat path.",
+   rv:[0.8,-2.2,-1.6]},
+ {id:3,name:"Elite Athletes (Teacherman)",color:"#74b816",
+   summary:"Upper echelon bat speed, high line drive and fly ball attack angle, short tight swing with early contact.",
+   weak:"Very few weaknesses relative to other archetypes. They vary by player: some struggle with slider and sweeper, others more with splitter and changeup.",
+   rv:[2.0,1.2,0.9]},
+ {id:4,name:"Standard",color:"#12b76a",
+   summary:"Every swing metric is near average: through the middle, average line drive swing, moderate in every category.",
+   weak:"Sidearm sweeper and off speed. Performs well against most fastball types.",
+   rv:[1.6,-1.8,-1.5]},
+ {id:5,name:"Weak Pull FB",color:"#0ca678",
+   summary:"Low bat speed, looking to launch pull side fastballs with long, uptilt swings.",
+   weak:"Curveball, sweeper, slider. Big total movement pitches, since they want to hit the ball square at max bat speed.",
+   rv:[2.2,-2.6,0.4]},
+ {id:6,name:"Short Pull FB",color:"#6f8e5a",
+   summary:"Similar to the Weak Pull FB, but a much shorter swing with more bat speed.",
+   traits:"Aggressive steep attack, vulnerable to changing planes.",
+   weak:"Curveball (32.5%), sweeper, slider, split. Same total movement idea, but with higher strikeout rates.",
+   rv:[1.8,-2.9,-1.2]},
+ {id:7,name:"Slap Hitter",color:"#6f7a45",
+   summary:"The weakest overall type. Looking to minimize strikeouts by putting the ball in play and on the ground.",
+   weak:"Attack with your best pitch in the zone. The worst case is usually a hard hit single anyway, so the damage range is narrow. Do not give away free bases, make them earn the single.",
+   rv:[-0.8,-0.6,-0.7]},
+ {id:8,name:"Line to Line",color:"#7048e8",
+   summary:"Elite bat speed, low attack angle, short swing with a deep contact point.",
+   weak:"Pretty good against every type. Get them to commit to a half: once they commit up, throw the splitter or changeup.",
+   rv:[1.4,1.0,-0.9]},
+ {id:9,name:"Jake Mangum",color:"#ae3ec9",
+   summary:"A one player cluster and an extreme outlier. Long swing, slow, flat bat, extremely opposite field.",
+   traits:"Too specific to generalize, may need personal scouting.",
+   weak:"Recommendation: treat as an extreme version of the Slap Hitter.",
+   rv:[-0.7,-0.5,-0.6]}
+];
+
+/* PCA scatter: spread 10 clusters; #9 is a lone outlier */
+const CENT=[[-1.7,1.3],[1.6,1.1],[0.1,-1.6],[-1.5,-1.0],[0.0,0.2],[1.9,-0.4],[1.2,1.9],[2.0,-1.7],[-0.9,0.9],[-2.6,-2.4]];
+const dsets=ARCH.map((a,i)=>{const n=(a.id===9)?1:14;const pts=[];
+  for(let k=0;k<n;k++)pts.push({x:CENT[i][0]+(a.id===9?0:(rnd()-.5)*1.3),y:CENT[i][1]+(a.id===9?0:(rnd()-.5)*1.2)});
+  return {label:a.id+" "+a.name,data:pts,backgroundColor:a.color,pointRadius:a.id===9?7:4,pointStyle:a.id===9?"rectRot":"circle"};});
+new Chart(document.getElementById("pcaChart"),{type:"scatter",data:{datasets:dsets},
+  options:{plugins:{legend:{position:"right",labels:{boxWidth:10,font:{size:10}}}},scales:{x:{title:{display:true,text:"PC 1"}},y:{title:{display:true,text:"PC 2"}}}}});
+
+/* archetype cards */
+document.getElementById("archGrid").innerHTML=ARCH.map(a=>`
+  <div class="arch" style="background:linear-gradient(160deg,${a.color},${a.color}cc)">
+    <div class="tag">Archetype ${a.id}</div><h4>${a.name}</h4>
+    <p style="font-size:.83rem;margin:8px 0 6px;"><b>Summary.</b> ${a.summary}</p>
+    ${a.traits?`<p style="font-size:.83rem;margin:0 0 6px;"><b>Traits.</b> ${a.traits}</p>`:""}
+    <p style="font-size:.83rem;margin:0;"><b>Weakness.</b> ${a.weak}</p>
+  </div>`).join("");
+
+/* vulnerability matrix */
+const PF=["Fastball","Breaking","Off Speed"];
+let vh=`<thead><tr><th class="l">Archetype</th>${PF.map(p=>`<th>${p} RV/100</th>`).join("")}</tr></thead><tbody>`;
+ARCH.forEach(a=>{vh+=`<tr><td class="l"><span style="color:${a.color}">&#9679;</span> ${a.id} ${a.name}</td>`+
+  a.rv.map(v=>`<td class="${v>0?'good':'bad'}">${v>0?'+':''}${v.toFixed(1)}</td>`).join("")+`</tr>`;});
+document.getElementById("vulnTable").innerHTML=vh+"</tbody>";
+
+/* Model 1: feature importance + classification output */
+const IMP=[["Bat Speed",.22],["Attack Angle",.19],["Swing Tilt",.16],["Contact Depth",.13],["Swing Length",.11],["wOBA",.10],["HardHit%",.09]];
+new Chart(document.getElementById("impChart"),{type:"bar",data:{labels:IMP.map(i=>i[0]),
+  datasets:[{label:"Importance",data:IMP.map(i=>i[1]),backgroundColor:"#c68a4e"}]},
+  options:{indexAxis:"y",plugins:{legend:{display:false},title:{display:true,text:"Random Forest feature importance"}},scales:{x:{max:.28}}}});
+document.getElementById("clsOut").innerHTML=
+`<span class="m"># RandomForestClassifier, accuracy 0.86</span>
+<span class="k">predict</span>(test_hitter)  <span class="m"># Bat 74.6, AA 17, short path</span>
+
+  Predicted archetype:
+    <span class="g">3 Elite Athletes (Teacherman)</span>
+
+  class probabilities
+    3 Elite Athletes    <span class="g">0.64</span>
+    8 Line to Line      0.18
+    0 Textbook A to B   0.09
+    6 Short Pull FB     0.05
+    others              0.04`;
+
+/* Model 2: run value regressor */
+const reg=[];for(let i=0;i<40;i++){const a=(rnd()-.5)*6;reg.push({x:+a.toFixed(2),y:+(a+ (rnd()-.5)*2.1).toFixed(2)});}
+new Chart(document.getElementById("regChart"),{type:"scatter",data:{datasets:[
+  {label:"pitch",data:reg,backgroundColor:"#6f7a45",pointRadius:4},
+  {type:"line",label:"perfect",data:[{x:-3.5,y:-3.5},{x:3.5,y:3.5}],borderColor:"#c68a4e",borderDash:[6,5],pointRadius:0}]},
+  options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:"Actual RV"}},y:{title:{display:true,text:"Predicted RV"}}}}});
+document.getElementById("regOut").innerHTML=
+`<span class="m"># GradientBoostingRegressor</span>
+<span class="k">params</span>: n_estimators=<span class="o">500</span>,
+        learning_rate=<span class="o">0.02</span>,
+        max_depth=<span class="o">6</span>
+
+<span class="k">manual feature weights</span>
+    wOBA        <span class="o">0.335</span>
+    SLG         <span class="o">0.310</span>
+    Barrel%     0.140
+    HardHit%    0.120
+    Whiff%      0.055
+    K%          0.040
+
+<span class="k">validation</span>
+    R^2   <span class="g">0.71</span>
+    RMSE  <span class="g">0.94</span> runs / 100`;
+
+/* Model 3: tier progression */
+const prog=[
+ ["Bat Speed","+2.4 mph","1.08"],["Ideal Attack Angle Rate","+9 pts","0.92"],
+ ["Barrel%","+3.1 pts","0.81"],["Swing Tilt","+4 deg","0.63"],["Chase Rate","lower by 4 pts","0.55"]];
+let ph=`<thead><tr><th class="l">Progression factor (Above Avg to Elite)</th><th>Target shift</th><th>Cohen's d</th></tr></thead><tbody>`;
+prog.forEach(r=>{ph+=`<tr><td class="l">${r[0]}</td><td>${r[1]}</td><td class="good">${r[2]}</td></tr>`;});
+document.getElementById("progTable").innerHTML=ph+"</tbody>";
+</script>
+</body>
+</html>

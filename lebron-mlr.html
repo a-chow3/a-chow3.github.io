@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NBA Contract Value Predictor · Adam Chow</title>
+<meta name="description" content="Case study: a multiple linear regression model predicting NBA LEBRON value to judge whether a contract is justified." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav class="nav"><div class="container">
+ <a class="brand" href="index.html" style="text-decoration:none">Adam<span>Chow</span></a>
+ <button class="burger" id="burger">☰</button>
+ <div class="links" id="navlinks"><a href="index.html#projects">Projects</a><a href="dashboard.html">Basketball</a><a href="index.html" class="btn-nav">← Home</a></div>
+</div></nav>
+
+<header class="cs-hero"><div class="container">
+ <a href="index.html#projects" class="back">← Back to projects</a>
+ <span class="eyebrow">Basketball · Machine learning · Group project</span>
+ <h1>NBA Contract Value Predictor</h1>
+ <p class="sub">My piece of a group project: a multiple linear regression model that predicts a player's future LEBRON
+ value, so a front office can judge whether a contract of the expected size is actually justified.</p>
+ <div class="cs-meta">
+ <div class="box"><div class="l">My contribution</div><div class="v">The MLR model (mlr_model.py)</div></div>
+ <div class="box"><div class="l">Stack</div><div class="v">Python · statsmodels · scikit learn</div></div>
+ <div class="box"><div class="l">Audience</div><div class="v">Front office decision makers</div></div>
+ <div class="box"><div class="l">Data</div><div class="v">Basketball Reference · LEBRON (public)</div></div>
+ </div>
+</div></header>
+
+<section class="section"><div class="container prose">
+ <div class="demo-banner"><b>The model output below uses <span class="pill dummy">dummy values</span></b> in the real
+ format that <code>mlr_model.py</code> prints. The full group project lives in the
+ <a href="https://github.com/jack-joy/ML1_Project" target="_blank" rel="noopener">public repository</a>. I built the
+ regression model. The team's Streamlit app is left out on purpose, since it is not currently running.</p></div>
+
+ <h2>Purpose</h2>
+ <p>Contracts are where front offices win and lose. The question I set out to answer was simple to state and hard to
+ answer well: given how a player performs, what should he actually be worth, and does the contract he is likely to
+ get make sense? LEBRON is a single, well regarded measure of a player's value, so I built a model to predict a
+ player's future LEBRON from his current profile and use that as the yardstick.</p>
+
+ <h2>Target audience</h2>
+ <p>Front office decision makers weighing an extension or a free agent deal, who need a defensible number for what a
+ player is worth rather than a gut feel.</p>
+
+ <h2>Methods</h2>
+ <p>I pulled current season per game and advanced stats from Basketball Reference, merged them with LEBRON values,
+ and handled players who changed teams mid season. After feature selection I settled on thirteen inputs that balance
+ scoring efficiency, playmaking, defense, usage, and value. I trained an ordinary least squares model on an 80 / 20
+ split and evaluated it with R squared and mean squared error on the held out set.</p>
+
+ <h2>Results</h2>
+ <p>The model produces a projected LEBRON for each player, which becomes a fair value estimate for a contract. Compare
+ that projection against the deal on the table and you get a clean verdict: value, fair, or overpay.</p>
+
+ <h2>Skills demonstrated</h2>
+ <div class="chips">
+ <span class="chip">Multiple Linear Regression</span><span class="chip">statsmodels</span><span class="chip">Feature Selection</span>
+ <span class="chip">Train / Test Evaluation</span><span class="chip">Web Data Ingestion</span><span class="chip">Sports Valuation</span>
+ </div>
+</div></section>
+
+<section class="section alt"><div class="container">
+ <span class="eyebrow">The deliverable · <span class="pill dummy">dummy values</span></span>
+ <h2>Example model output</h2>
+
+ <div class="panel">
+ <h3>OLS regression summary</h3>
+ <div class="model-out" id="olsOut"></div>
+ <div class="how-to"><b>How to read it:</b> R squared is the share of variation in LEBRON the model explains, so a
+ test R squared near 0.8 means the inputs track real value well. Each coefficient is how much predicted LEBRON
+ moves per unit of that stat, holding the others fixed. Efficiency and value metrics like WS/48 and VORP carry the
+ most weight, which lines up with basketball intuition.</div>
+ </div>
+
+ <div class="panel">
+ <h3>Predicted value vs the contract on the table</h3>
+ <div style="overflow-x:auto;"><table class="dtable-lite" id="predTable"></table></div>
+ <div class="how-to"><b>How to read it:</b> the model's projected LEBRON becomes a fair salary estimate. Set it
+ against the expected contract and the verdict falls out. <span style="color:#2f9e44;font-weight:700">Value</span>
+ means the player projects to outplay the deal, <span style="color:#e03131;font-weight:700">Overpay</span> means
+ the deal outruns the projection, and Fair means they roughly match. That is the exact call a front office is
+ trying to make.</div>
+ </div>
+
+ <div class="panel">
+ <h3>Projected vs actual LEBRON</h3>
+ <div class="chart-wrap short"><canvas id="fitChart"></canvas></div>
+ <div class="how-to"><b>How to read it:</b> points near the dashed line are players the model nailed. A point well
+ above the line is a player the model thinks is better than his current LEBRON suggests, a natural buy low
+ candidate. Below the line is the opposite, a possible sell high.</div>
+ </div>
+</div></section>
+
+<footer class="footer"><div class="container">
+ <h2>More in the portfolio</h2>
+ <div class="social">
+ <a href="index.html">← Back to portfolio</a>
+ <a href="https://github.com/jack-joy/ML1_Project" target="_blank" rel="noopener"> View the repository</a>
+ <a href="mailto:adamkchow3@gmail.com"> adamkchow3@gmail.com</a>
+ </div>
+ <div class="fine">© <span id="yr"></span> Adam Chow · Model output shown uses fabricated values for public display.</div>
+</div></footer>
+
+<script>
+document.getElementById('yr').textContent=new Date().getFullYear();
+var burger=document.getElementById('burger'),links=document.getElementById('navlinks');
+burger.addEventListener('click',function(){links.classList.toggle('open');});
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rnd=mulberry32(2306);
+
+document.getElementById("olsOut").innerHTML=
+`<span class="m"># OLS regression, dependent variable: LEBRON</span>
+<span class="k">Train R^2</span> <span class="g">0.816</span> <span class="k">Test R^2</span> <span class="g">0.784</span>
+<span class="k">Train MSE</span> <span class="g">0.541</span> <span class="k">Test MSE</span> <span class="g">0.673</span>
+n = 214 players features = 13
+
+<span class="k">coef</span> variable <span class="k">P&gt;|t|</span>
+ <span class="o">+3.41</span> WS/48 0.000
+ <span class="o">+1.87</span> VORP 0.000
+ <span class="o">+0.92</span> USG% 0.004
+ <span class="o">+0.55</span> AST 0.011
+ <span class="o">+0.48</span> eFG% 0.007
+ <span class="o">+0.31</span> STL 0.028
+ <span class="o">+0.22</span> TRB 0.061
+ <span class="o">-0.18</span> Age 0.033
+ <span class="m">... 3P%, 3PAr, FT%, BLK, Minutes</span>`;
+
+// predictions table
+const players=["Player A","Player B","Player C","Player D","Player E","Player F","Player G"];
+const rows=players.map(n=>{const proj=+(rnd()*6-1).toFixed(2);const fair=+(6+proj*2.4).toFixed(1);
+ const deal=+(fair+ (rnd()-.5)*10).toFixed(1);
+ const gap=fair-deal;const v=gap>2.5?["Value","good"]:gap<-2.5?["Overpay","bad"]:["Fair",""];
+ return {n,proj,fair,deal,v};}).sort((a,b)=>b.proj-a.proj);
+let th=`<thead><tr><th class="l">Player</th><th>Proj. LEBRON</th><th>Fair salary ($M)</th><th>Expected deal ($M)</th><th>Verdict</th></tr></thead><tbody>`;
+rows.forEach(r=>{th+=`<tr><td class="l">${r.n}</td><td>${r.proj}</td><td>$${r.fair}M</td><td>$${r.deal}M</td><td class="${r.v[1]}">${r.v[0]}</td></tr>`;});
+document.getElementById("predTable").innerHTML=th+"</tbody>";
+
+// fit scatter
+const pts=[];for(let i=0;i<50;i++){const a=+(rnd()*8-2).toFixed(2);pts.push({x:a,y:+(a+(rnd()-.5)*2).toFixed(2)});}
+new Chart(document.getElementById("fitChart"),{type:"scatter",data:{datasets:[
+ {label:"player",data:pts,backgroundColor:"#c68a4e",pointRadius:4},
+ {type:"line",label:"perfect",data:[{x:-2,y:-2},{x:6,y:6}],borderColor:"#1b4332",borderDash:[6,5],pointRadius:0}]},
+ options:{plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:"Actual LEBRON"}},y:{title:{display:true,text:"Predicted LEBRON"}}}}});
+</script>
+</body>
+</html>

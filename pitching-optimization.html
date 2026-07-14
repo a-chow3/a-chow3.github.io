@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pitching Optimization &amp; PES · Adam Chow</title>
+<meta name="description" content="Case study: a Pitch Efficiency Score, matchup clustering, and decision tree models for UVA Baseball pitching optimization." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav class="nav"><div class="container">
+ <a class="brand" href="index.html" style="text-decoration:none">Adam<span>Chow</span></a>
+ <button class="burger" id="burger">☰</button>
+ <div class="links" id="navlinks"><a href="index.html#projects">Projects</a><a href="baseball-shiny.html">Baseball</a><a href="index.html" class="btn-nav">← Home</a></div>
+</div></nav>
+
+<header class="cs-hero"><div class="container">
+ <a href="index.html#projects" class="back">← Back to projects</a>
+ <span class="eyebrow">Baseball · UVA Baseball</span>
+ <h1>Pitching Optimization &amp; PES</h1>
+ <p class="sub">A run value engine that scores every pitch, clusters pitches by matchup, and trains decision trees
+ that show the exact point where a pitch flips from helping the pitcher to helping the hitter.</p>
+ <div class="cs-meta">
+ <div class="box"><div class="l">Role</div><div class="v">Analyst</div></div>
+ <div class="box"><div class="l">Stack</div><div class="v">Python · scikit learn · R Shiny</div></div>
+ <div class="box"><div class="l">Audience</div><div class="v">Pitchers and pitching coaches</div></div>
+ <div class="box"><div class="l">Data</div><div class="v">UVA game tracking (proprietary)</div></div>
+ </div>
+</div></header>
+
+<section class="section"><div class="container prose">
+ <div class="demo-banner"><b>All figures use <span class="pill dummy">dummy data</span>.</b> The Pitch Efficiency Score,
+ the clustering, and the decision tree logic are the real design. UVA's underlying tracking data is proprietary and
+ is not present here. Code lives in the <a href="https://github.com/a-chow3/STAT4996" target="_blank" rel="noopener">public repository</a>.</p></div>
+
+ <h2>Purpose</h2>
+ <p>The core problem is putting a trustworthy number on the value of a single pitch. Results alone lie to you, a well
+ executed pitch can still get hit. I built a run value attribution system that scores every possible pitch outcome,
+ rolls it into a Pitch Efficiency Score, and then uses that score to find what a genuinely good pitch looks like in
+ a specific matchup.</p>
+
+ <h2>Target audience</h2>
+ <p>Pitchers and the pitching staff. The end product is a benchmark a pitcher can train toward, expressed as concrete
+ thresholds in velocity, movement, and location rather than abstract math.</p>
+
+ <h2>Methods</h2>
+ <p>I start from a hard coded run value for every pitch result, then compute a Pitch Efficiency Score for each pitch.
+ I group pitches by pitcher handedness against batter handedness and by pitch type, and cluster within those groups
+ to find profiles of successful pitches. For each matchup and pitch type I fit a decision tree on the pitcher's
+ average metrics, which reveals the thresholds where a pitch stops working. An earlier exploratory pass used K Means
+ to cluster MLB pitchers by value and study how a handful of average bodied arms produced elite results.</p>
+
+ <h2>Results</h2>
+ <p>The output is a set of readable, matchup specific benchmarks: for example, in a lefty on righty look, sliders
+ buried down and in beat sliders left over the plate, which drift into the hitter's barrel path. Coaches get a clear
+ target for execution instead of a vague instruction to throw a better slider.</p>
+
+ <h2>Skills demonstrated</h2>
+ <div class="chips">
+ <span class="chip">Run Value Modeling</span><span class="chip">K Means</span><span class="chip">Decision Trees</span>
+ <span class="chip">Feature Engineering</span><span class="chip">R Shiny</span><span class="chip">Data Visualization</span>
+ </div>
+</div></section>
+
+<section class="section alt"><div class="container">
+ <span class="eyebrow">Deliverable 1 · <span class="pill dummy">dummy data</span></span>
+ <h2>Pitcher value clusters (MLB EDA)</h2>
+ <div class="panel">
+ <div class="chart-wrap"><canvas id="kmChart"></canvas></div>
+ <div class="how-to"><b>How to read it:</b> K Means split MLB pitchers into four value tiers using expected and
+ actual performance. The top cluster is highlighted. Within it, I zoomed in on arms that produce elite results
+ without the height and weight advantages, to learn what the rest of a staff can actually copy.</div>
+ </div>
+
+ <span class="eyebrow">Deliverable 2 · <span class="pill dummy">dummy data</span></span>
+ <h2>Pitch Efficiency Score leaderboard</h2>
+ <div class="panel">
+ <div style="overflow-x:auto;"><table class="dtable-lite" id="pesTable"></table></div>
+ <div class="how-to"><b>How to read it:</b> PES rolls each pitch's run value impact into one number. Higher is a more
+ efficient pitch. Because it scores process and not just the box score, a pitch that was hit hard but perfectly
+ located still grades well, which is exactly what you want when coaching execution.</div>
+ </div>
+
+ <span class="eyebrow">Deliverable 3 · <span class="pill dummy">dummy data</span></span>
+ <h2>Matchup decision tree</h2>
+ <div class="panel">
+ <div class="select-row">
+ <div><label>Matchup</label><select id="treeSel">
+ <option>L vs R · Slider</option><option>R vs R · 4 Seam</option><option>R vs L · Change</option></select></div>
+ </div>
+ <div id="treeWrap" style="overflow-x:auto;"></div>
+ <div class="how-to"><b>How to read it:</b> follow the branches from the top. Each split is a metric threshold. A
+ <span style="color:#5f6a34;font-weight:700">blue</span> leaf is a spot where the pitch favors the pitcher, an
+ <span style="color:#c68a4e;font-weight:700">orange</span> leaf favors the hitter. The path to a blue leaf is the
+ execution target: hit these velocity, movement, and location marks and the pitch plays.</div>
+ </div>
+</div></section>
+
+<footer class="footer"><div class="container">
+ <h2>More in the portfolio</h2>
+ <div class="social">
+ <a href="index.html">← Back to portfolio</a>
+ <a href="https://github.com/a-chow3/STAT4996" target="_blank" rel="noopener"> View the repository</a>
+ <a href="mailto:adamkchow3@gmail.com"> adamkchow3@gmail.com</a>
+ </div>
+ <div class="fine">© <span id="yr"></span> Adam Chow · Figures shown are fabricated for public display.</div>
+</div></footer>
+
+<script>
+document.getElementById('yr').textContent=new Date().getFullYear();
+var burger=document.getElementById('burger'),links=document.getElementById('navlinks');
+burger.addEventListener('click',function(){links.classList.toggle('open');});
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rnd=mulberry32(49607);
+
+// KMeans scatter: x=expected value, y=actual value, 4 clusters
+const centers=[[1.4,1.5,"#12b76a","Elite value (top cluster)"],[0.4,0.5,"#6f7a45","Solid"],[-0.5,-0.3,"#b3773a","Below"],[-1.4,-1.4,"#adb5bd","Replacement"]];
+const kmSets=centers.map(c=>{const pts=[];for(let i=0;i<22;i++)pts.push({x:+(c[0]+(rnd()-.5)*1.1).toFixed(2),y:+(c[1]+(rnd()-.5)*1.1).toFixed(2)});
+ return {label:c[3],data:pts,backgroundColor:c[2],pointRadius:c[2]==="#12b76a"?6:4,pointStyle:c[2]==="#12b76a"?"rectRot":"circle"};});
+new Chart(document.getElementById("kmChart"),{type:"scatter",data:{datasets:kmSets},
+ options:{plugins:{legend:{position:"right"},title:{display:true,text:"Pitcher value clusters"}},
+ scales:{x:{title:{display:true,text:"Expected value (z)"}},y:{title:{display:true,text:"Actual value (z)"}}}}});
+
+// PES leaderboard
+const names=["J. Halstead","K. Boone","L. Ferrara","M. Underwood","N. Sato","O. Delacroix","P. Quill","R. Osei"];
+const rows=names.map(n=>({n,pes:+ (rnd()*40+60).toFixed(1),fb:+(rnd()*40+55).toFixed(1),sl:+(rnd()*45+50).toFixed(1),ch:+(rnd()*45+50).toFixed(1)}))
+ .sort((a,b)=>b.pes-a.pes);
+let ph=`<thead><tr><th class="l">Pitcher</th><th>PES (overall)</th><th>Fastball</th><th>Slider</th><th>Change</th></tr></thead><tbody>`;
+rows.forEach(r=>{ph+=`<tr><td class="l">${r.n}</td><td><b>${r.pes}</b></td><td>${r.fb}</td><td>${r.sl}</td><td>${r.ch}</td></tr>`;});
+document.getElementById("pesTable").innerHTML=ph+"</tbody>";
+
+// decision tree (SVG) per matchup
+const TREES={
+"L vs R · Slider":{root:"Horizontal break < -6 in ?",
+ y:{node:"Location: down &amp; in ?",y:{leaf:"pitcher",txt:"PES 78 · buried glove side"},n:{leaf:"hitter",txt:"PES 41 · backs up over plate"}},
+ n:{node:"Velo > 84 mph ?",y:{leaf:"pitcher",txt:"PES 66 · firm, late"},n:{leaf:"hitter",txt:"PES 38 · slurvy, early tip"}}},
+"R vs R · 4 Seam":{root:"Induced vert break > 16 in ?",
+ y:{node:"Location: top third ?",y:{leaf:"pitcher",txt:"PES 81 · rides the top"},n:{leaf:"hitter",txt:"PES 47 · flat in the zone"}},
+ n:{node:"Velo > 93 mph ?",y:{leaf:"pitcher",txt:"PES 63 · velo carries it"},n:{leaf:"hitter",txt:"PES 35 · hittable heater"}}},
+"R vs L · Change":{root:"Velo separation > 9 mph ?",
+ y:{node:"Location: low &amp; away ?",y:{leaf:"pitcher",txt:"PES 80 · fades off barrel"},n:{leaf:"hitter",txt:"PES 44 · firm, in zone"}},
+ n:{node:"Arm-side run > 12 in ?",y:{leaf:"pitcher",txt:"PES 61 · movement saves it"},n:{leaf:"hitter",txt:"PES 33 · no separation"}}}
+};
+function leafBox(x,y,leaf,txt){
+ const col=leaf==="pitcher"?"#5f6a34":"#c68a4e";
+ return `<rect x="${x-80}" y="${y}" width="160" height="46" rx="8" fill="${col}"/>
+ <text x="${x}" y="${y+19}" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">${leaf==="pitcher"?"Favors pitcher":"Favors hitter"}</text>
+ <text x="${x}" y="${y+36}" text-anchor="middle" fill="#fff" font-size="10.5">${txt}</text>`;
+}
+function nodeBox(x,y,label){return `<rect x="${x-95}" y="${y}" width="190" height="40" rx="8" fill="#1b4332"/>
+ <text x="${x}" y="${y+24}" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">${label}</text>`;}
+function edge(x1,y1,x2,y2,lab){return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#adb5bd" stroke-width="1.5"/>
+ <text x="${(x1+x2)/2}" y="${(y1+y2)/2-3}" text-anchor="middle" fill="#5b6478" font-size="10" font-weight="700">${lab}</text>`;}
+function drawTree(key){
+ const t=TREES[key]; const W=760,H=340;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:700px">`;
+ // root at 380,10 ; two mid nodes 190 & 570 at y110 ; leaves at y250
+ s+=edge(380,50,190,110,"Yes")+edge(380,50,570,110,"No");
+ s+=edge(190,150,90,250,"Yes")+edge(190,150,300,250,"No");
+ s+=edge(570,150,470,250,"Yes")+edge(570,150,680,250,"No");
+ s+=nodeBox(380,10,t.root);
+ s+=nodeBox(190,110,t.y.node)+nodeBox(570,110,t.n.node);
+ s+=leafBox(90,250,t.y.y.leaf,t.y.y.txt)+leafBox(300,250,t.y.n.leaf,t.y.n.txt);
+ s+=leafBox(470,250,t.n.y.leaf,t.n.y.txt)+leafBox(680,250,t.n.n.leaf,t.n.n.txt);
+ s+=`</svg>`;
+ document.getElementById("treeWrap").innerHTML=s;
+}
+const ts=document.getElementById("treeSel");
+ts.addEventListener("change",()=>drawTree(ts.value));drawTree(ts.value);
+</script>
+</body>
+</html>

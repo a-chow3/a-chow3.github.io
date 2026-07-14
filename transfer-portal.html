@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Transfer Portal Performance Prediction · Adam Chow</title>
+<meta name="description" content="Case study: predicting NCAA pitching transfer performance with Self-Organizing Maps and machine learning." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav class="nav"><div class="container">
+ <a class="brand" href="index.html" style="text-decoration:none">Adam<span>Chow</span></a>
+ <button class="burger" id="burger">☰</button>
+ <div class="links" id="navlinks"><a href="index.html#projects">Projects</a><a href="baseball-shiny.html">Baseball</a><a href="index.html" class="btn-nav">← Home</a></div>
+</div></nav>
+
+<header class="cs-hero"><div class="container">
+ <a href="index.html#projects" class="back">← Back to projects</a>
+ <span class="eyebrow">Baseball · Machine learning · UVA Baseball</span>
+ <h1>Transfer Portal Performance Prediction</h1>
+ <p class="sub">Two predictive models that surface the handful of variables that separate transfer pitchers, with Self
+ Organizing Maps used to reveal release angle archetypes across the portal.</p>
+ <div class="cs-meta">
+ <div class="box"><div class="l">Role</div><div class="v">Analyst</div></div>
+ <div class="box"><div class="l">Stack</div><div class="v">R · Python · Kohonen SOM · Plotly</div></div>
+ <div class="box"><div class="l">Audience</div><div class="v">Recruiting and pitching staff</div></div>
+ <div class="box"><div class="l">Scale</div><div class="v">200+ NCAA pitching transfers</div></div>
+ </div>
+</div></header>
+
+<section class="section"><div class="container prose">
+ <div class="demo-banner"><b>All figures use <span class="pill dummy">dummy data</span>.</b> The modeling approach and
+ the Self Organizing Map are the real design. UVA's underlying data is proprietary and is not present here.</p></div>
+
+ <h2>Purpose</h2>
+ <p>The transfer portal moves fast and the stakes are high. A staff needs to know, quickly, which incoming arms are
+ likely to help and why. I built models that identify the small set of variables that actually predict transfer
+ performance, so recruiting decisions lean on signal instead of reputation.</p>
+
+ <h2>Target audience</h2>
+ <p>The recruiting and pitching staff making portal decisions on a deadline. The deliverable has to be fast to read
+ and defensible when a coach asks why the model likes a player.</p>
+
+ <h2>Methods</h2>
+ <p>I built two predictive models that each narrow a wide dataset down to five to ten key variables for evaluating a
+ pitcher. Alongside them I used Self Organizing Maps to compress each pitcher's release profile onto a two
+ dimensional map, which groups arms into release angle archetypes and makes similar pitchers land near each other.
+ Dynamic visualizations let the staff compare an incoming transfer against the archetype he most resembles.</p>
+
+ <h2>Results</h2>
+ <p>The models turn a sprawling portal into a short, ranked shortlist with a clear rationale for each name, and the
+ archetype map gives the staff an intuitive way to say who a new pitcher pitches like.</p>
+
+ <h2>Skills demonstrated</h2>
+ <div class="chips">
+ <span class="chip">Self Organizing Maps</span><span class="chip">Random Forest</span><span class="chip">Feature Selection</span>
+ <span class="chip">Dimensionality Reduction</span><span class="chip">R and Python</span><span class="chip">Data Visualization</span>
+ </div>
+</div></section>
+
+<section class="section alt"><div class="container">
+ <span class="eyebrow">Deliverable 1 · <span class="pill dummy">dummy data</span></span>
+ <h2>Release angle archetype map</h2>
+ <div class="panel">
+ <div class="zone-wrap" style="align-items:flex-start;">
+ <div><svg id="somMap" viewBox="0 0 360 360" width="360" height="360"></svg></div>
+ <div style="max-width:280px;">
+ <div id="somLegend"></div>
+ </div>
+ </div>
+ <div class="how-to"><b>How to read it:</b> the Self Organizing Map lays every pitcher on a grid so that similar
+ release profiles sit next to each other. Each colored region is an archetype of arm slot and release angle. When
+ a transfer maps into a region, you instantly know which of your current pitchers he throws like, and what has
+ worked or not worked for that group.</div>
+ </div>
+
+ <span class="eyebrow">Deliverable 2 · <span class="pill dummy">dummy data</span></span>
+ <h2>Transfer projection model</h2>
+ <div class="panel">
+ <div style="display:grid;grid-template-columns:.9fr 1.1fr;gap:22px;" class="mm-grid">
+ <div><div class="chart-wrap short"><canvas id="tpImp"></canvas></div>
+ <div class="legend-row" style="justify-content:center;">Key predictors the model kept</div></div>
+ <div>
+ <table class="dtable-lite" id="tpTable"></table>
+ </div>
+ </div>
+ <div class="how-to"><b>How to read it:</b> the bars are the five to ten variables the model kept after selection,
+ the ones that actually move the projection. The table ranks incoming transfers by projected next season value,
+ with a fit grade for how cleanly each maps onto a proven archetype. A high projection with a high fit is the
+ safest bet, a high projection with a low fit is the high upside gamble.</div>
+ </div>
+</div></section>
+
+<footer class="footer"><div class="container">
+ <h2>More in the portfolio</h2>
+ <div class="social">
+ <a href="index.html">← Back to portfolio</a>
+ <a href="mailto:adamkchow3@gmail.com"> adamkchow3@gmail.com</a>
+ <a href="https://github.com/a-chow3" target="_blank" rel="noopener"> github.com/a-chow3</a>
+ </div>
+ <div class="fine">© <span id="yr"></span> Adam Chow · Figures shown are fabricated for public display.</div>
+</div></footer>
+
+<script>
+document.getElementById('yr').textContent=new Date().getFullYear();
+var burger=document.getElementById('burger'),links=document.getElementById('navlinks');
+burger.addEventListener('click',function(){links.classList.toggle('open');});
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rnd=mulberry32(31771);
+
+// SOM: 9x9 grid, 4 archetype regions blended
+const ARCH=[[ "Over the top", "#6f7a45",1.5,1.5],["High three quarter","#12b76a",7,2],["Low three quarter","#c68a4e",2,7],["Sidearm / sub","#7048e8",7,7]];
+const N=9, cell=38, pad=6;
+let s="";
+for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+ // nearest archetype center decides color, distance sets lightness
+ let best=0,bd=1e9;
+ ARCH.forEach((a,i)=>{const d=(c-a[2])**2+(r-a[3])**2;if(d<bd){bd=d;best=i;}});
+ const t=Math.max(.25,1-bd/40);
+ const col=ARCH[best][1];
+ const x=pad+c*cell, y=pad+r*cell;
+ s+=`<rect x="${x}" y="${y}" width="${cell-3}" height="${cell-3}" rx="5" fill="${col}" opacity="${t.toFixed(2)}"/>`;
+}
+// a few sample pitchers as dots
+for(let i=0;i<10;i++){const cx=pad+rnd()*(N*cell-cell)+cell/2, cy=pad+rnd()*(N*cell-cell)+cell/2;
+ s+=`<circle cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" r="4" fill="#0e1f17" stroke="#fff" stroke-width="1.5"/>`;}
+document.getElementById("somMap").innerHTML=s;
+document.getElementById("somLegend").innerHTML=ARCH.map(a=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+ <span style="width:16px;height:16px;border-radius:4px;background:${a[1]};display:inline-block"></span>
+ <b style="color:var(--navy)">${a[0]}</b></div>`).join("")+
+ `<p style="font-size:.82rem;color:var(--muted);margin-top:8px;">White dots are sample transfers placed by the map.</p>`;
+
+// feature importance
+const IMP=[["Whiff%",.20],["Release Height",".17"],["IVB",.15],["Extension",.13],["Chase%",.12],["Command+",.12],["Velo",.11]].map(x=>[x[0],+x[1]]);
+new Chart(document.getElementById("tpImp"),{type:"bar",data:{labels:IMP.map(i=>i[0]),datasets:[{data:IMP.map(i=>i[1]),backgroundColor:"#c68a4e"}]},
+ options:{indexAxis:"y",plugins:{legend:{display:false},title:{display:true,text:"Selected predictors"}},scales:{x:{max:.24}}}});
+
+// transfer table
+const names=["Transfer A","Transfer B","Transfer C","Transfer D","Transfer E","Transfer F"];
+const grades=["A","A-","B+","B","B-","C+"];
+const rows=names.map((n,i)=>({n,proj:+(rnd()*2+1.5).toFixed(2),era:+(rnd()*1.6+2.6).toFixed(2),fit:grades[i],arch:ARCH[Math.floor(rnd()*4)][0]}))
+ .sort((a,b)=>b.proj-a.proj);
+let th=`<thead><tr><th class="l">Player</th><th>Proj. value (WAR)</th><th>Proj. ERA</th><th>Archetype</th><th>Fit</th></tr></thead><tbody>`;
+rows.forEach(r=>{th+=`<tr><td class="l">${r.n}</td><td><b>${r.proj}</b></td><td>${r.era}</td><td>${r.arch}</td><td class="good">${r.fit}</td></tr>`;});
+document.getElementById("tpTable").innerHTML=th+"</tbody>";
+</script>
+</body>
+</html>
