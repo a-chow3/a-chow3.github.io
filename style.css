@@ -91,7 +91,6 @@ a:hover { text-decoration: underline; }
 .hero .grid { display: grid; grid-template-columns: 1.3fr .9fr; gap: 56px; align-items: center; }
 .hero h1 { color: #f3f6ee; }
 .hero h1 .accent { color: var(--sage); }
-.hero .role-title { font-family:'Sora',sans-serif; font-weight:800; color:#f3f6ee; font-size: clamp(2.6rem, 6vw, 4.2rem); line-height:1.04; letter-spacing:-0.02em; margin:0 0 18px; }
 .hero .lead { font-size: 1.18rem; color: #cdd8c8; max-width: 580px; }
 .hero .lead .kicker { color:#b6c9ad; font-weight:700; }
 .hero .role { font-weight: 600; color: #fff; }
