@@ -71,7 +71,7 @@ a:hover { text-decoration: underline; }
 }
 .nav .container { display: flex; align-items: center; justify-content: space-between; height: 64px; }
 .nav .brand { font-family: 'Sora', sans-serif; font-weight: 700; color: #f3f6ee; font-size: 1.05rem; letter-spacing: .01em; }
-.nav .brand span { color: var(--sage); }
+.nav .brand span { color: #f3f6ee; }
 .nav .links { display: flex; gap: 26px; align-items: center; }
 .nav .links a { color: #c4d0c2; font-size: .93rem; font-weight: 500; }
 .nav .links a:hover { color: #fff; text-decoration: none; }
